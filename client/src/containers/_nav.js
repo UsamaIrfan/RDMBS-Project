@@ -54,6 +54,16 @@ const _nav = [
   },
   {
     _tag: 'CSidebarNavTitle',
+    _children: ['Sales']
+  },
+  {
+    _tag: 'CSidebarNavItem',
+    icon: "cil-chart-pie",
+    name: 'Sales',
+    to: '/sales/allsales',
+  },
+  {
+    _tag: 'CSidebarNavTitle',
     _children: ['Theme']
   },
   {

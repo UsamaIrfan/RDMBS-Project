@@ -52,7 +52,7 @@ const Product = ({ match }) => {
         confirmBtnText="Yes, delete it!"
         confirmBtnBsStyle="danger"
         title="Are you sure?"
-        onConfirm={() => {setDeleteAlert(false); deleteCatagory(catagory.categories_id)}}
+        onConfirm={() => { setDeleteAlert(false); deleteCatagory(catagory.categories_id) }}
         onCancel={() => setDeleteAlert(false)}
         focusCancelBtn
       >
@@ -81,9 +81,14 @@ const Product = ({ match }) => {
         <CCard>
           <CCardHeader style={{ justifyContent: "space-between", display: "flex" }}>
             Catagory id: {match.params.id}
-            <CCol style={{ maxWidth: "120px", justifyContent: "flex-end", display: "flex" }} col="6" sm="4" md="2" className="mb-2 mb-xl-0">
-              <CButton onClick={() => setDeleteAlert(true)} block color="danger">Delete</CButton>
-            </CCol>
+            <CRow className="align-items-center">
+              <CCol col="6" sm="4" md="2" xl className="mb-1 mb-xl-0">
+                <CButton block color="primary" className="d-xl-flex" onClick={() => history.push(`/catagories/${match.params.id}/products`)}>Products</CButton>
+              </CCol>
+              <CCol col="6" sm="4" md="2" xl className="mb-1 mb-xl-0">
+                <CButton block color="danger" onClick={() => setDeleteAlert(true)} className="col-12">Delete</CButton>
+              </CCol>
+            </CRow>
           </CCardHeader>
           <CCardBody>
             <table className="table table-striped table-hover">

@@ -8,24 +8,19 @@ import {
   CCol,
   CDataTable,
   CRow,
-  CPagination,
-  CDropdown,
-  CDropdownDivider,
-  CDropdownItem,
-  CDropdownMenu,
-  CDropdownToggle,
+  CPagination
 } from '@coreui/react'
 import { useDispatch, useSelector } from 'react-redux'
 
-import { getAllProducts } from 'src/actions/ProductActions'
-import { withStyles } from '@material-ui/core/styles';
+import { getAllProducts, getProductsByTimeline } from 'src/actions/ProductActions'
+import { withStyles, makeStyles } from '@material-ui/core/styles';
 import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
+import Tooltip from '@material-ui/core/Tooltip';
 import axios from "axios";
 import { GET_PRODUCTS, SERVER_API } from 'src/actions/actionTypes'
 import Loader from "../../../reusable/Loader";
 import { motion } from "framer-motion"
-import { getAllCatagories } from 'src/actions/CatagoryActions'
 
 const getBadge = status => {
   switch (status) {
@@ -85,7 +80,6 @@ const Products = () => {
 
   // Selectors =================>
   const products = useSelector(state => state.products)
-  const catagories = useSelector(state => state.catagories)
 
   // Page Change Handler ===============>
   const pageChange = newPage => {
@@ -101,7 +95,6 @@ const Products = () => {
   useEffect(() => {
     getProducts()
     getProductsTimeline()
-    getCatagories()
   }, [])
 
   // Calculating number of pages on every render ==================>
@@ -109,18 +102,11 @@ const Products = () => {
     setNumberOfPages(products?.length > 0 ? Math.ceil(products.length / NUMBER_OF_PRODUCT_PER_SCREEN) : null)
   })
 
-
-
   const getProducts = async () => {
     setIsLoading(true)
     await dispatch(getAllProducts())
     setIsLoading(false)
   }
-
-  const getCatagories = async () => {
-    await dispatch(getAllCatagories())
-  }
-
 
   // Server Calls Functions ====================>
   const getProductsTimeline = async () => {
@@ -175,49 +161,22 @@ const Products = () => {
       <CCol xl={9}>
         <CCard>
           <CCardHeader>
-            All Products
+            All Sales
             <small className="text-muted"> Inventory</small>
           </CCardHeader>
-          <CRow className="flex-row p-3">
-            {RangeTimeline && <CCol xl={6}>
-              <Typography>Search</Typography>
-              <PrettoSlider
-                valueLabelDisplay="auto"
-                aria-labelledby="pretto slider"
-                value={RangeValue}
-                step={1}
-                min={2016}
-                max={2021}
-                onChange={handleChange}
-              />
-            </CCol>}
-            <CCol xl={3} className="p-3">
-              <CDropdown className="m-1">
-                <CDropdownToggle color="info">
-                  Flter By Catagory
-                </CDropdownToggle>
-                <CDropdownMenu style={{ maxHeight: "250px", overflowY: "scroll" }}>
-                  {catagories?.map((item) => (
-                    <CDropdownItem>{item.categories_name}</CDropdownItem>
-                  ))}
-                  <CDropdownDivider />
-                </CDropdownMenu>
-              </CDropdown>
-            </CCol>
-            <CCol xl={3} className="p-3">
-              <CDropdown className="m-1">
-                <CDropdownToggle color="info">
-                  Order By
-                </CDropdownToggle>
-                <CDropdownMenu style={{ maxHeight: "250px", overflowY: "scroll" }}>
-                  <CDropdownItem>Sales</CDropdownItem>
-                  <CDropdownItem>Register Date</CDropdownItem>
-                  <CDropdownItem>Expiry Date</CDropdownItem>
-                  <CDropdownDivider />
-                </CDropdownMenu>
-              </CDropdown>
-            </CCol>
-          </CRow>
+          {RangeTimeline && <CCol xl={6} className="p-3">
+            <Typography>Search</Typography>
+            <PrettoSlider
+              valueLabelDisplay="auto"
+              aria-labelledby="pretto slider"
+              value={RangeValue}
+              step={1}
+              min={2016}
+              max={2021}
+              onChange={handleChange}
+              valueLabelDisplay="auto"
+            />
+          </CCol>}
           <CCardBody>
             <motion.div layout>
 

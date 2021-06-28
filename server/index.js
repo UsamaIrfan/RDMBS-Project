@@ -117,6 +117,32 @@ app.get("/api/getproducts", (req, res) => {
 
 })
 
+app.get("/api/getcatproducts", (req, res) => {
+
+    const id = req.query.id
+
+    const sqlGetProducts =
+        `SELECT * FROM products WHERE parent_id = ${id};`
+
+    const sqlGetProductsCount = `SELECT COUNT(*) FROM inventorysystem.products;`
+
+    db.query(sqlGetProducts, (err, products) => {
+        if (!err && products) {
+            db.query(sqlGetProductsCount, (err, productCount) => {
+                let count = productCount ? productCount[0]["COUNT(*)"] : 0
+                res.send({
+                    success: true,
+                    List: products,
+                    count: count,
+                })
+            })
+        } else {
+            res.send(err)
+        }
+    })
+
+})
+
 app.get("/api/getproduct", (req, res) => {
 
     const product_id = req.query.id
@@ -211,16 +237,16 @@ app.delete("/api/delproduct", (req, res) => {
     const product_id = req.query.id
 
     const sqlDeleteProduct = `DELETE FROM products WHERE product_id = ${product_id} LIMIT 1;`
-    
+
     const sqlGetProductsCount = `SELECT COUNT(*) FROM inventorysystem.products;`
-    
+
     // const sqlInsertPrice = (id) =>
     //     `INSERT INTO product_price 
     // (pp_productId, pp_buyingPrice, pp_sellingPrice, pp_discount, pp_profitPercentage) VALUES 
     // (${id}, ${productBuyPrice}, ${productPrice}, ${discount ? discount : null}, ${profitPercent ? profitPercent : null});`
-    
+
     db.query(sqlDeleteProduct, (err, product) => {
-        if (!err && product) {
+        if (!err && product?.affectedRows > 0) {
             res.send({
                 success: true,
                 message: "Product Deleted",
@@ -228,42 +254,42 @@ app.delete("/api/delproduct", (req, res) => {
         } else {
             res.send({
                 success: false,
-                message: err,
+                message: err ? err : product,
             })
         }
     })
-    
+
 })
 
 app.post("/api/addcatagory", (req, res) => {
-    
+
     const catName = req.body.catName
     const catActive = req.body.catActive
     const regDate = req.body.regDate
     const subCats = req.body.subCats
-    
+
     const sqlInsertCatagory = (id) =>
-    `INSERT INTO categories 
+        `INSERT INTO categories 
     (categories_id, categories_name, categories_isActive, register_date) VALUES 
     (${id}, '${catName}', '${catActive}', '${regDate}');`
-    
-    
+
+
     const sqlGetCatagoryCount = `SELECT COUNT(*) FROM inventorysystem.categories;`
-    
+
     db.query(sqlGetCatagoryCount, (err, resolve) => {
-        
+
         let count = resolve ? resolve[0]["COUNT(*)"].toString().concat(Math.floor(Math.random() * 10) + 1) : 0
-        
+
         db.query(sqlInsertCatagory(count), (err, resolve) => {
-            
+
             if (!err && resolve && count != 0) {
-                
+
                 let sqlQuery = `INSERT INTO sub_catagories (subcat_name, catagory_id) VALUES `
-                
+
                 subCats.forEach((item) => {
                     sqlQuery = sqlQuery.concat(`('${item.text}', ${count}),`)
                 })
-                
+
                 db.query(
                     sqlQuery.substring(0, sqlQuery.length - 1),
                     (err, resolve) => {
@@ -282,7 +308,7 @@ app.post("/api/addcatagory", (req, res) => {
                         }
                     }
                 )
-                
+
             } else {
                 if (err.code === "ER_DUP_ENTRY") {
                     res.send({
@@ -293,21 +319,21 @@ app.post("/api/addcatagory", (req, res) => {
             }
         })
     })
-    
+
 })
 
 app.get("/api/getcatagories", (req, res) => {
-    
+
     const sqlGetCategories =
-    `SELECT * FROM categories;`
-    
+        `SELECT * FROM categories;`
+
     const sqlGetProductsCount = `SELECT COUNT(*) FROM inventorysystem.categories;`
-    
+
     // const sqlInsertPrice = (id) =>
     //     `INSERT INTO product_price 
     // (pp_productId, pp_buyingPrice, pp_sellingPrice, pp_discount, pp_profitPercentage) VALUES 
     // (${id}, ${productBuyPrice}, ${productPrice}, ${discount ? discount : null}, ${profitPercent ? profitPercent : null});`
-    
+
     db.query(sqlGetCategories, (err, catagories) => {
         if (!err && catagories) {
             db.query(sqlGetProductsCount, (err, catCount) => {
@@ -322,14 +348,14 @@ app.get("/api/getcatagories", (req, res) => {
             res.send(err)
         }
     })
-    
+
 })
 
 app.get("/api/getcatagory", (req, res) => {
     const id = req.query.id
     const sqlGetCatagory = `SELECT * FROM categories WHERE categories_id = ${id} LIMIT 1;`
     const sqlGetProductsCount = `SELECT COUNT(*) FROM products WHERE parent_id = ${id};`
-    
+
     db.query(sqlGetCatagory, (err, cat) => {
         if (!err && cat) {
 
@@ -381,14 +407,14 @@ app.delete("/api/delcatagory", (req, res) => {
 
 
 app.get("/api/getsubcats", (req, res) => {
-    
+
     const cat_id = req.query.id
-    
+
     const sqlGetSubCategories = (id) =>
-    `SELECT * FROM sub_catagories WHERE catagory_id = ${id};`
-    
+        `SELECT * FROM sub_catagories WHERE catagory_id = ${id};`
+
     const sqlGetProductsCount = `SELECT COUNT(*) FROM inventorysystem.sub_catagories WHERE catagory_id = ${cat_id};`
-    
+
     db.query(sqlGetSubCategories(cat_id), (err, catagories) => {
         if (!err && catagories) {
             db.query(sqlGetProductsCount, (err, subCatCount) => {
@@ -405,6 +431,56 @@ app.get("/api/getsubcats", (req, res) => {
     })
 
 })
+
+app.get("/api/getProductsTimeline", (req, res) => {
+
+    const sqlGetTimeline =
+        `SELECT YEAR(MAX(register_date)) as maxYear,YEAR(MIN(register_date)) as minYear  FROM products;`
+
+
+    db.query(sqlGetTimeline, (err, Timeline) => {
+        if (!err && Timeline) {
+            res.send({
+                success: true,
+                data: Timeline[0],
+            })
+        } else {
+            res.send({
+                success: false,
+                message: "Unable to get Years Timeline.",
+                error: err,
+            })
+        }
+    })
+
+})
+
+app.get("/api/getProductsByTimeline", (req, res) => {
+
+    const min = req.query.minYear
+    const max = req.query.maxYear
+
+    const sqlGetTimelineProducts =
+        `SELECT * FROM inventorysystem.products WHERE YEAR(register_date) between ${min} and ${max};`
+
+
+    db.query(sqlGetTimelineProducts, (err, products) => {
+        if (!err && products) {
+            res.send({
+                success: true,
+                data: products,
+            })
+        } else {
+            res.send({
+                success: false,
+                message: "Unable to get Years Timeline Products.",
+                error: err,
+            })
+        }
+    })
+
+})
+
 
 app.listen(3001, () => {
     console.log("Running on Port 3001")

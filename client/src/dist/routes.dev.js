@@ -255,6 +255,18 @@ var Catagory = _react["default"].lazy(function () {
   });
 });
 
+var CatagoryProducts = _react["default"].lazy(function () {
+  return Promise.resolve().then(function () {
+    return _interopRequireWildcard(require('./views/Catagories/CatProducts'));
+  });
+});
+
+var AllSales = _react["default"].lazy(function () {
+  return Promise.resolve().then(function () {
+    return _interopRequireWildcard(require('./views/sales/AllSales'));
+  });
+});
+
 var routes = [{
   path: '/',
   exact: true,
@@ -452,6 +464,16 @@ var routes = [{
   exact: true,
   name: 'Catagory',
   component: Catagory
+}, {
+  path: '/catagories/:id/products',
+  exact: true,
+  name: 'Catagory Products',
+  component: CatagoryProducts
+}, {
+  path: '/sales/allsales',
+  exact: true,
+  name: 'All Sales',
+  component: AllSales
 }];
 var _default = routes;
 exports["default"] = _default;

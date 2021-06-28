@@ -90,6 +90,42 @@ export const getAllProducts = () => {
     }
 }
 
+export const getProductsById = (id) => {
+
+    return (dispatch) => {
+        axios.get(`${SERVER_API}/api/getcatproducts?id=${id}`,
+            {
+                headers: { "Content-Type": "application/json" },
+            }
+        )
+            .then((response) => {
+                if (response.data.success === true) {
+                    return response.data.List
+                }
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
+}
+
+export const getProductsByTimeline = () => {
+
+    axios.get(`${SERVER_API}/api/getProductsTimeline`,
+        {
+            headers: { "Content-Type": "application/json" },
+        }
+    )
+        .then((response) => {
+            if (response.data.success === true) {
+                return response.data.data
+            }
+        })
+        .catch((err) => {
+            console.log(err)
+        })
+}
+
 export const getProductById = (id) => {
 
     return (dispatch) => {
@@ -112,6 +148,7 @@ export const getProductById = (id) => {
 export const delProduct = (id, successAlert, FailAlert) => {
 
     return (dispatch) => {
+        console.log(`${SERVER_API}/api/delproduct?id=${id}`)
         axios.delete(`${SERVER_API}/api/delproduct?id=${id}`,
             {
                 headers: { "Content-Type": "application/json" },

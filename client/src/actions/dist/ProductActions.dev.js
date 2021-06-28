@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.delCatagory = exports.delProduct = exports.getProductById = exports.getAllProducts = exports.addCatagory = exports.addProduct = void 0;
+exports.delCatagory = exports.delProduct = exports.getProductById = exports.getProductsByTimeline = exports.getProductsById = exports.getAllProducts = exports.addCatagory = exports.addProduct = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
 
@@ -98,6 +98,40 @@ var getAllProducts = function getAllProducts() {
 
 exports.getAllProducts = getAllProducts;
 
+var getProductsById = function getProductsById(id) {
+  return function (dispatch) {
+    _axios["default"].get("".concat(_actionTypes.SERVER_API, "/api/getcatproducts?id=").concat(id), {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).then(function (response) {
+      if (response.data.success === true) {
+        return response.data.List;
+      }
+    })["catch"](function (err) {
+      console.log(err);
+    });
+  };
+};
+
+exports.getProductsById = getProductsById;
+
+var getProductsByTimeline = function getProductsByTimeline() {
+  _axios["default"].get("".concat(_actionTypes.SERVER_API, "/api/getProductsTimeline"), {
+    headers: {
+      "Content-Type": "application/json"
+    }
+  }).then(function (response) {
+    if (response.data.success === true) {
+      return response.data.data;
+    }
+  })["catch"](function (err) {
+    console.log(err);
+  });
+};
+
+exports.getProductsByTimeline = getProductsByTimeline;
+
 var getProductById = function getProductById(id) {
   return function (dispatch) {
     _axios["default"].get("".concat(_actionTypes.SERVER_API, "/api/getproduct?id=").concat(id), {
@@ -118,6 +152,8 @@ exports.getProductById = getProductById;
 
 var delProduct = function delProduct(id, successAlert, FailAlert) {
   return function (dispatch) {
+    console.log("".concat(_actionTypes.SERVER_API, "/api/delproduct?id=").concat(id));
+
     _axios["default"]["delete"]("".concat(_actionTypes.SERVER_API, "/api/delproduct?id=").concat(id), {
       headers: {
         "Content-Type": "application/json"

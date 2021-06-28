@@ -6,7 +6,7 @@ import axios from "axios"
 import { SERVER_API } from 'src/actions/actionTypes';
 import { useDispatch, useSelector } from 'react-redux';
 import SweetAlert from 'react-bootstrap-sweetalert';
-import { delCatagory } from 'src/actions/ProductActions';
+import { delProduct } from 'src/actions/ProductActions';
 
 const Product = ({ match }) => {
   const history = useHistory()
@@ -25,7 +25,7 @@ const Product = ({ match }) => {
   const dispatch = useDispatch()
 
   const deleteProduct = async (id) => {
-    await dispatch(delCatagory(id, setShowSuccess, setShowFail, history))
+    await dispatch(delProduct(id, setShowSuccess, setShowFail, history))
   }
 
   const getProduct = () => {
