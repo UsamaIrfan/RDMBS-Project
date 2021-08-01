@@ -90,6 +90,7 @@ export const getAllProducts = () => {
     }
 }
 
+
 export const getProductsById = (id) => {
 
     return (dispatch) => {
@@ -163,6 +164,27 @@ export const delProduct = (id, successAlert, FailAlert) => {
             })
             .catch((err) => {
                 FailAlert()
+                console.log(err)
+            })
+    }
+}
+
+export const searchProducts = (minYear, maxYear, catId, orderBy, searchKeywords) => {
+    return (dispatch) => {
+        axios.get(`${SERVER_API}/api/searchProducts?minYear=${minYear}&maxYear=${maxYear}${catId ? `&catagory=${catId}` : ""}${orderBy ? `&orderBy=${orderBy}` : ""}${searchKeywords ? `&search=${searchKeywords}` : ""}`,
+            {
+                headers: { "Content-Type": "application/json" },
+            }
+        )
+            .then(({ data }) => {
+                if (data.success === true) {
+                    dispatch({
+                        type: GET_PRODUCTS,
+                        products: data.data,
+                    })
+                }
+            })
+            .catch((err) => {
                 console.log(err)
             })
     }

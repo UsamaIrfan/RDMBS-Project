@@ -1,18 +1,15 @@
-const express = require("express")
-const bodyParser = require("body-parser")
-const mysql = require("mysql")
-const cors = require("cors")
-var url = require('url');
+import express from "express"
+import bodyParser from "body-parser"
+import mysql from "mysql"
+import cors from "cors"
+import url from 'url'
+import { db, connection } from "./config/index.js"
+import { DELETE, GET } from "./routes.js"
+import { getSales, insertSale } from "./actions/Sales.js"
+import { addProduct, delProduct, getProduct, getProductCount, getProducts, getProductsByTimeline, getProductTimeLine, productByCatagory, searchProducts } from "./actions/Products.js"
+import { addCatagory, delCatagory, getCatagory, getCats, getSubCatagories } from "./actions/Catagories.js"
 
 const app = express()
-
-const db = mysql.createPool({
-    host: "127.0.0.1",
-    port: 3306,
-    user: "root",
-    password: "password",
-    database: 'inventorysystem',
-})
 
 app.use(cors())
 app.use(express.json())
@@ -37,227 +34,60 @@ app.post("/api/addproduct", (req, res) => {
     const profitPercent = req.body.profitPercent
     const register_date = req.body.register_date
 
-    console.log(req.body)
+    addProduct(productName,
+        productBarcode,
+        productExpiry,
+        productCatagory,
+        productPrice,
+        subCatId,
+        productBuyPrice,
+        discount,
+        profitPercent,
+        register_date,
+        res
+    )
 
-    if (productPrice < 1) {
-        res.send(`Please Add a valid product price`)
-        return;
-    }
-
-    const sqlInsertProduct = (id) =>
-        `INSERT INTO products 
-    (product_id, product_name, ${productBarcode ? `product_barcode,` : ""} product_expiry, parent_id, register_date, subcat_id) VALUES 
-    (${id}, '${productName}', '${productBarcode ? `${productBarcode},` : ""}' '${productExpiry}', ${productCatagory}, '${register_date}', ${subCatId});`
-
-    const sqlGetProductCount = `SELECT COUNT(*) FROM inventorysystem.products;`
-
-    const sqlInsertPrice = (id) =>
-        `INSERT INTO product_price 
-    (pp_productId, pp_buyingPrice, pp_sellingPrice, pp_discount, pp_profitPercentage) VALUES 
-    (${id}, ${productBuyPrice}, ${productPrice}, ${discount ? discount : null}, ${profitPercent ? profitPercent : null});`
-
-
-    db.query(sqlGetProductCount, (err, resolve) => {
-
-        if (!err && resolve) {
-
-            let count = resolve ? resolve[0]["COUNT(*)"] : 0
-            const id = parseInt(`${productCatagory}${count}`)
-
-            db.query(sqlInsertProduct(id), (err, resolve) => {
-
-                if (!err && resolve) {
-
-                    db.query(sqlInsertPrice(id), (err, resolve) => {
-                        res.send({
-                            success: true,
-                            message: "Added Successfully"
-                        })
-                    })
-                } else {
-                    res.send(err ? err : resolve)
-                }
-
-
-            })
-
-        } else {
-            res.send(err ? err : resolve)
-        }
-    })
 
 })
 
-app.get("/api/getproducts", (req, res) => {
+app.get(GET.GET_PRODUCTS, (req, res) => {
 
-    const sqlGetProducts =
-        `SELECT * FROM products;`
+    const lowLimit = req.query.skip
+    const highLimit = req.query.numPerPage
 
-    const sqlGetProductsCount = `SELECT COUNT(*) FROM inventorysystem.products;`
-
-    // const sqlInsertPrice = (id) =>
-    //     `INSERT INTO product_price 
-    // (pp_productId, pp_buyingPrice, pp_sellingPrice, pp_discount, pp_profitPercentage) VALUES 
-    // (${id}, ${productBuyPrice}, ${productPrice}, ${discount ? discount : null}, ${profitPercent ? profitPercent : null});`
-
-    db.query(sqlGetProducts, (err, products) => {
-        if (!err && products) {
-            db.query(sqlGetProductsCount, (err, productCount) => {
-                let count = productCount ? productCount[0]["COUNT(*)"] : 0
-                res.send({
-                    success: true,
-                    List: products,
-                    count: count,
-                })
-            })
-        } else {
-            res.send(err)
-        }
-    })
+    getProducts(lowLimit, highLimit, res)
 
 })
 
-app.get("/api/getcatproducts", (req, res) => {
+app.get(GET.PRODUCT_COUNT, (req, res) => {
+
+    getProductCount(res)
+
+})
+
+
+app.get(GET.CAT_PRODUCTS, (req, res) => {
 
     const id = req.query.id
 
-    const sqlGetProducts =
-        `SELECT * FROM products WHERE parent_id = ${id};`
-
-    const sqlGetProductsCount = `SELECT COUNT(*) FROM inventorysystem.products;`
-
-    db.query(sqlGetProducts, (err, products) => {
-        if (!err && products) {
-            db.query(sqlGetProductsCount, (err, productCount) => {
-                let count = productCount ? productCount[0]["COUNT(*)"] : 0
-                res.send({
-                    success: true,
-                    List: products,
-                    count: count,
-                })
-            })
-        } else {
-            res.send(err)
-        }
-    })
+    productByCatagory(id, res)
 
 })
 
-app.get("/api/getproduct", (req, res) => {
+app.get(GET.GET_PRODUCT, (req, res) => {
 
     const product_id = req.query.id
 
-    const sqlGetProduct = `SELECT * FROM products WHERE product_id = ${product_id} LIMIT 1;`
-    const sqlGetPrice = `SELECT * FROM product_price WHERE pp_productId = ${product_id} LIMIT 1;`
-    const sqlGetCatagory = (id) => `SELECT * FROM categories WHERE categories_id = ${id} LIMIT 1;`
-    const sqlGetSubCatagory = (id) => `SELECT * FROM sub_catagories WHERE subcat_id = ${id} LIMIT 1;`
-
-
-    db.query(sqlGetProduct, (err, product) => {
-        if (!err && product) {
-
-            db.query(sqlGetPrice, (err, price) => {
-                if (!err && price) {
-
-                    db.query(sqlGetCatagory(product[0]?.parent_id),
-                        (err, cat) => {
-                            if (!err && cat) {
-
-                                if (product[0]?.subcat_id) {
-
-                                    db.query(sqlGetSubCatagory(product[0]?.subcat_id),
-                                        (err, subCat) => {
-                                            if (!err && subCat) {
-                                                res.send({
-                                                    success: true,
-                                                    product: {
-                                                        ...product[0],
-                                                        catagory: cat[0]?.categories_name,
-                                                        ...price[0],
-                                                        subCat: subCat[0]?.subcat_name,
-                                                    },
-                                                })
-                                            } else {
-                                                res.send({
-                                                    success: false,
-                                                    message: "Unable To Get Sub Catagory Data.",
-                                                    error: err,
-                                                })
-                                            }
-                                        }
-                                    )
-
-                                } else {
-                                    res.send({
-                                        success: true,
-                                        product: {
-                                            catagory: cat[0]?.categories_name,
-                                            ...product[0],
-                                            ...price[0]
-                                        },
-                                    })
-                                }
-
-
-                            } else {
-                                res.send({
-                                    success: false,
-                                    message: "Unable To Get Catagory Data.",
-                                    error: err,
-                                })
-                            }
-
-                        }
-
-                    )
-
-                } else {
-                    res.send({
-                        success: false,
-                        message: "Unable TO Get Pricing.",
-                        error: err,
-                    })
-                }
-            })
-
-        } else {
-            res.send({
-                success: false,
-                message: "Unable to Get Product",
-                error: err,
-            })
-        }
-    })
+    getProduct(product_id, res)
 
 })
 
 
-app.delete("/api/delproduct", (req, res) => {
+app.delete(DELETE.DEL_PRODUCT, (req, res) => {
 
     const product_id = req.query.id
 
-    const sqlDeleteProduct = `DELETE FROM products WHERE product_id = ${product_id} LIMIT 1;`
-
-    const sqlGetProductsCount = `SELECT COUNT(*) FROM inventorysystem.products;`
-
-    // const sqlInsertPrice = (id) =>
-    //     `INSERT INTO product_price 
-    // (pp_productId, pp_buyingPrice, pp_sellingPrice, pp_discount, pp_profitPercentage) VALUES 
-    // (${id}, ${productBuyPrice}, ${productPrice}, ${discount ? discount : null}, ${profitPercent ? profitPercent : null});`
-
-    db.query(sqlDeleteProduct, (err, product) => {
-        if (!err && product?.affectedRows > 0) {
-            res.send({
-                success: true,
-                message: "Product Deleted",
-            })
-        } else {
-            res.send({
-                success: false,
-                message: err ? err : product,
-            })
-        }
-    })
+    delProduct(product_id, res)
 
 })
 
@@ -268,136 +98,103 @@ app.post("/api/addcatagory", (req, res) => {
     const regDate = req.body.regDate
     const subCats = req.body.subCats
 
-    const sqlInsertCatagory = (id) =>
-        `INSERT INTO categories 
-    (categories_id, categories_name, categories_isActive, register_date) VALUES 
-    (${id}, '${catName}', '${catActive}', '${regDate}');`
-
-
-    const sqlGetCatagoryCount = `SELECT COUNT(*) FROM inventorysystem.categories;`
-
-    db.query(sqlGetCatagoryCount, (err, resolve) => {
-
-        let count = resolve ? resolve[0]["COUNT(*)"].toString().concat(Math.floor(Math.random() * 10) + 1) : 0
-
-        db.query(sqlInsertCatagory(count), (err, resolve) => {
-
-            if (!err && resolve && count != 0) {
-
-                let sqlQuery = `INSERT INTO sub_catagories (subcat_name, catagory_id) VALUES `
-
-                subCats.forEach((item) => {
-                    sqlQuery = sqlQuery.concat(`('${item.text}', ${count}),`)
-                })
-
-                db.query(
-                    sqlQuery.substring(0, sqlQuery.length - 1),
-                    (err, resolve) => {
-                        if (!err && resolve) {
-                            res.send({
-                                success: true,
-                                message: "Added Successfully.",
-                            })
-                        } else {
-                            res.send({
-                                success: false,
-                                message: "Failed to Add Product.",
-                                error: err,
-                                query: sqlQuery
-                            })
-                        }
-                    }
-                )
-
-            } else {
-                if (err.code === "ER_DUP_ENTRY") {
-                    res.send({
-                        success: false,
-                        message: "The catagory already exists.",
-                    })
-                }
-            }
-        })
-    })
+    addCatagory(catName, catActive, regDate, subCats, res)
 
 })
 
-app.get("/api/getcatagories", (req, res) => {
+app.get(GET.GET_CATAGORIES, (req, res) => {
 
-    const sqlGetCategories =
-        `SELECT * FROM categories;`
-
-    const sqlGetProductsCount = `SELECT COUNT(*) FROM inventorysystem.categories;`
-
-    // const sqlInsertPrice = (id) =>
-    //     `INSERT INTO product_price 
-    // (pp_productId, pp_buyingPrice, pp_sellingPrice, pp_discount, pp_profitPercentage) VALUES 
-    // (${id}, ${productBuyPrice}, ${productPrice}, ${discount ? discount : null}, ${profitPercent ? profitPercent : null});`
-
-    db.query(sqlGetCategories, (err, catagories) => {
-        if (!err && catagories) {
-            db.query(sqlGetProductsCount, (err, catCount) => {
-                let count = catCount ? catCount[0]["COUNT(*)"] : 0
-                res.send({
-                    success: true,
-                    List: catagories,
-                    count: count,
-                })
-            })
-        } else {
-            res.send(err)
-        }
-    })
+    getCats(res)
 
 })
 
-app.get("/api/getcatagory", (req, res) => {
+app.get(GET.GET_CATAGORY, (req, res) => {
     const id = req.query.id
-    const sqlGetCatagory = `SELECT * FROM categories WHERE categories_id = ${id} LIMIT 1;`
-    const sqlGetProductsCount = `SELECT COUNT(*) FROM products WHERE parent_id = ${id};`
 
-    db.query(sqlGetCatagory, (err, cat) => {
-        if (!err && cat) {
-
-            db.query(sqlGetProductsCount, (err, productCount) => {
-                let count = productCount ? productCount[0]["COUNT(*)"] : 0
-                res.send({
-                    success: true,
-                    catagory: {
-                        ...cat[0],
-                        products: count,
-                    }
-                })
-            })
-
-        } else {
-            res.send({
-                success: false,
-                message: "Unable to get Catagory Data.",
-                error: err,
-            })
-        }
-    })
+    getCatagory(id, res)
 
 })
 
 
-app.delete("/api/delcatagory", (req, res) => {
+app.delete(DELETE.DEL_CATAGORY, (req, res) => {
 
     const catId = req.query.id
 
-    const sqlDeleteCatagory = `DELETE FROM categories WHERE categories_id = ${catId} LIMIT 1;`
+    delCatagory(catId, res)
 
-    db.query(sqlDeleteCatagory, (err, cat) => {
-        if (!err && cat) {
+})
+
+
+app.get(GET.GET_SUBCATAGORIES, (req, res) => {
+
+    const cat_id = req.query.id
+
+    getSubCatagories(cat_id, res)
+
+})
+
+app.get(GET.GET_PRODUCT_TIMELINE, (req, res) => {
+
+    getProductTimeLine(res)
+
+})
+
+app.get("/api/getProductsByTimeline", (req, res) => {
+
+    const min = req.query.minYear
+    const max = req.query.maxYear
+
+    getProductsByTimeline(min, max, res)
+
+})
+
+app.get(GET.SEARCH_PRODUCTS, (req, res) => {
+
+    const search = req.query.search
+    const min = req.query.minYear
+    const max = req.query.maxYear
+    const cat = req.query.catagory
+    const orderBy = req.query.orderBy
+    const desc = req.query.desc
+    const limit = req.query.limit
+
+    searchProducts(
+        search,
+        min,
+        max,
+        cat,
+        orderBy,
+        desc,
+        limit,
+        res
+    )
+
+})
+
+app.get(GET.GET_SALES, (req, res) => {
+
+    const min = req.query.minYear
+    const max = req.query.maxYear
+    const orderBy = req.query.orderBy
+    const desc = req.query.desc
+
+
+    const GetSales =
+        `SELECT * FROM inventorysystem.sales 
+        WHERE YEAR(Sale_date) between ${min} and ${max}
+        ORDER BY ${orderBy ? orderBy : "Sale_Id"} ${desc ? "DESC" : "ASC"};`
+
+
+    db.query(GetSales, (err, sales) => {
+        if (!err && sales) {
             res.send({
                 success: true,
-                message: "Catagory Deleted",
+                data: sales,
             })
         } else {
             res.send({
                 success: false,
-                message: "Unable To delete Catagory",
+                message: "Unable to get Sales.",
                 error: err,
             })
         }
@@ -405,37 +202,19 @@ app.delete("/api/delcatagory", (req, res) => {
 
 })
 
+app.get(GET.GET_SALE, (req, res) => {
 
-app.get("/api/getsubcats", (req, res) => {
+    const id = req.query.id
 
-    const cat_id = req.query.id
-
-    const sqlGetSubCategories = (id) =>
-        `SELECT * FROM sub_catagories WHERE catagory_id = ${id};`
-
-    const sqlGetProductsCount = `SELECT COUNT(*) FROM inventorysystem.sub_catagories WHERE catagory_id = ${cat_id};`
-
-    db.query(sqlGetSubCategories(cat_id), (err, catagories) => {
-        if (!err && catagories) {
-            db.query(sqlGetProductsCount, (err, subCatCount) => {
-                let count = subCatCount ? subCatCount[0]["COUNT(*)"] : 0
-                res.send({
-                    success: true,
-                    List: catagories,
-                    count: count,
-                })
-            })
-        } else {
-            res.send(err)
-        }
-    })
+    getSales(id, res)
 
 })
 
-app.get("/api/getProductsTimeline", (req, res) => {
+
+app.get(GET.GET_SALES_TIMELINE, (req, res) => {
 
     const sqlGetTimeline =
-        `SELECT YEAR(MAX(register_date)) as maxYear,YEAR(MIN(register_date)) as minYear  FROM products;`
+        `SELECT YEAR(MAX(Sale_date)) as maxYear,YEAR(MIN(Sale_date)) as minYear  FROM sales;`
 
 
     db.query(sqlGetTimeline, (err, Timeline) => {
@@ -455,29 +234,30 @@ app.get("/api/getProductsTimeline", (req, res) => {
 
 })
 
-app.get("/api/getProductsByTimeline", (req, res) => {
+app.post("/api/insertsale", (req, res) => {
 
-    const min = req.query.minYear
-    const max = req.query.maxYear
+    const user = req.body.user
+    const date = req.body.date
+    const totalAmount = req.body.totalAmount
+    const totalDiscount = req.body.totalDiscount
+    const amountGiven = req.body.amountGiven
+    const amountReturned = req.body.amountReturned
+    const paytype = req.body.paytype
+    const status = req.body.status
+    const products = req.body.products
 
-    const sqlGetTimelineProducts =
-        `SELECT * FROM inventorysystem.products WHERE YEAR(register_date) between ${min} and ${max};`
-
-
-    db.query(sqlGetTimelineProducts, (err, products) => {
-        if (!err && products) {
-            res.send({
-                success: true,
-                data: products,
-            })
-        } else {
-            res.send({
-                success: false,
-                message: "Unable to get Years Timeline Products.",
-                error: err,
-            })
-        }
-    })
+    insertSale(
+        user,
+        date,
+        totalAmount,
+        totalDiscount,
+        amountGiven,
+        amountReturned,
+        paytype,
+        status,
+        products,
+        res,
+    )
 
 })
 

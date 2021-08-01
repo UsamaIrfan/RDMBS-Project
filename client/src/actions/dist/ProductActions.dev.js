@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.delCatagory = exports.delProduct = exports.getProductById = exports.getProductsByTimeline = exports.getProductsById = exports.getAllProducts = exports.addCatagory = exports.addProduct = void 0;
+exports.delCatagory = exports.searchProducts = exports.delProduct = exports.getProductById = exports.getProductsByTimeline = exports.getProductsById = exports.getAllProducts = exports.addCatagory = exports.addProduct = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
 
@@ -172,6 +172,29 @@ var delProduct = function delProduct(id, successAlert, FailAlert) {
 };
 
 exports.delProduct = delProduct;
+
+var searchProducts = function searchProducts(minYear, maxYear, catId, orderBy, searchKeywords) {
+  return function (dispatch) {
+    _axios["default"].get("".concat(_actionTypes.SERVER_API, "/api/searchProducts?minYear=").concat(minYear, "&maxYear=").concat(maxYear).concat(catId ? "&catagory=".concat(catId) : "").concat(orderBy ? "&orderBy=".concat(orderBy) : "").concat(searchKeywords ? "&search=".concat(searchKeywords) : ""), {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    }).then(function (_ref3) {
+      var data = _ref3.data;
+
+      if (data.success === true) {
+        dispatch({
+          type: _actionTypes.GET_PRODUCTS,
+          products: data.data
+        });
+      }
+    })["catch"](function (err) {
+      console.log(err);
+    });
+  };
+};
+
+exports.searchProducts = searchProducts;
 
 var delCatagory = function delCatagory(id, successAlert, FailAlert) {
   return function (dispatch) {

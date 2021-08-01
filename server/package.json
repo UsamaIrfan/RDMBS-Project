@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "management system",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node index.js",
-    "devStart": "nodemon start",
-    "type": "module"
+    "devStart": "nodemon start"
   },
   "author": "",
   "license": "ISC",

@@ -1,6 +1,6 @@
-const mysql = require("mysql")
+import mysql from "mysql"
 
-const db = mysql.createPool({
+export const db = mysql.createPool({
     host: "127.0.0.1",
     port: 3306,
     user: "root",
@@ -8,4 +8,10 @@ const db = mysql.createPool({
     database: 'inventorysystem',
 })
 
-module.exports = db;
+export const connection = mysql.createConnection({
+    host: "127.0.0.1",
+    port: 3306,
+    user: "root",
+    password: "password",
+    database: 'inventorysystem',
+})

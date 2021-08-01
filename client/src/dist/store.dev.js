@@ -23,7 +23,8 @@ var initialState = {
   sidebarShow: 'responsive',
   user: null,
   products: [],
-  catagories: []
+  catagories: [],
+  sales: []
 };
 
 var changeState = function changeState() {
@@ -49,6 +50,11 @@ var changeState = function changeState() {
     case _actionTypes.GET_CATAGORIES:
       return _objectSpread({}, state, {
         catagories: action.catagories
+      });
+
+    case _actionTypes.GET_SALES:
+      return _objectSpread({}, state, {
+        sales: action.sales
       });
 
     default:

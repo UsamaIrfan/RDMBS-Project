@@ -267,6 +267,18 @@ var AllSales = _react["default"].lazy(function () {
   });
 });
 
+var SaleDetails = _react["default"].lazy(function () {
+  return Promise.resolve().then(function () {
+    return _interopRequireWildcard(require('./views/sales/SaleDetails'));
+  });
+});
+
+var AddSale = _react["default"].lazy(function () {
+  return Promise.resolve().then(function () {
+    return _interopRequireWildcard(require('./views/sales/AddSale'));
+  });
+});
+
 var routes = [{
   path: '/',
   exact: true,
@@ -474,6 +486,16 @@ var routes = [{
   exact: true,
   name: 'All Sales',
   component: AllSales
+}, {
+  path: '/sales/addsale',
+  exact: true,
+  name: 'Add Sale',
+  component: AddSale
+}, {
+  path: '/sales/:id',
+  exact: true,
+  name: 'Sales Details',
+  component: SaleDetails
 }];
 var _default = routes;
 exports["default"] = _default;

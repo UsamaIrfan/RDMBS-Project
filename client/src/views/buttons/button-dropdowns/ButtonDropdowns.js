@@ -58,62 +58,6 @@ const ButtonDropdowns = () => {
                 <CDropdownItem>Another Action</CDropdownItem>
                 <CDropdownItem>Another Action</CDropdownItem>
                 <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
-                <CDropdownItem>Another Action</CDropdownItem>
               </CDropdownMenu>
             </CDropdown>
             <CDropdown className="m-1 btn-group">
