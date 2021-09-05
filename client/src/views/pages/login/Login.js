@@ -8,14 +8,16 @@ import {
   CCol,
   CContainer,
   CForm,
+  CSpinner ,
   CInput,
   CInputGroup,
   CInputGroupPrepend,
   CInputGroupText,
-  CRow
+  CRow,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import {useDispatch} from "react-redux"
+import {motion} from "framer-motion";
 
 // Sign in Actions
 import * as AuthActions from "../../../actions/storeActions";
@@ -23,10 +25,12 @@ import * as AuthActions from "../../../actions/storeActions";
 const Login = () => {
 
   const [Email, setEmail] = React.useState("")
+  const [Loading, setLoading] = React.useState(false)
   const [Password, setPassword] = React.useState("")
   const [Error, setError] = React.useState({
     Email: false,
-    Password: false
+    Password: false,
+    toMany: false,
   })
   
   const dispatch = useDispatch()
@@ -34,9 +38,10 @@ const Login = () => {
 
 
 
-  const loginHandler = () => {
-    console.log("RNG")
-    dispatch(AuthActions.login(Email, Password, setError, history))
+  const loginHandler = async () => {
+    setLoading(true)
+    await dispatch(AuthActions.login(Email, Password, setError, history))
+    setLoading(false)
   }
 
   return (
@@ -47,7 +52,7 @@ const Login = () => {
             <CCardGroup>
               <CCard className="p-4">
                 <CCardBody>
-                  <CForm>
+                  <CForm onSubmit={loginHandler}>
                     <h1>Login</h1>
                     <p className="text-muted">Sign In to your account</p>
                     <CInputGroup className="mb-3">
@@ -64,15 +69,15 @@ const Login = () => {
                           <CIcon name="cil-lock-locked" />
                         </CInputGroupText>
                       </CInputGroupPrepend>
-                      <CInput invalid={Error.Password} onChange={e => setPassword(e.target.value)} value={Password} type="password" placeholder="Password" autoComplete="current-password" />
+                      <CInput onSubmit={loginHandler} invalid={Error.Password} onChange={e => setPassword(e.target.value)} value={Password} type="password" placeholder="Password" autoComplete="current-password" />
                     </CInputGroup>
                     <CRow>
-                      <CCol xs="6">
-                        <CButton color="primary" onClick={loginHandler}  className="px-4">Login</CButton>
+                      <CCol xs="5">
+                      <CButton type="submit" color="primary" onClick={loginHandler}  className="px-4"><motion.div initial={{width: "80px"}} animate={Loading ? {width: "100px"} : {width: "80px"}}>{Loading && <CSpinner size="sm" className={"mr-2"} />}Login</motion.div></CButton>
                       </CCol>
-                      {/* <CCol xs="6" className="text-right">
-                        <CButton color="link" className="px-0">Forgot password?</CButton>
-                      </CCol> */}
+                      {Error.toMany && <CCol xs="7" className="text-right">
+                        <p color="danger" className="px-0 text-danger">To many Attempts, try again later.</p>
+                      </CCol>}
                     </CRow>
                   </CForm>
                 </CCardBody>

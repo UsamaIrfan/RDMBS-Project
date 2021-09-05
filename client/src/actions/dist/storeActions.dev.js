@@ -19,32 +19,49 @@ var googleprovider = new _Firebase.firebase.auth.GoogleAuthProvider(); // Auth =
 
 var login = function login(Email, password, setError, history) {
   // login Logic
-  return function (dispatch) {
-    console.log("Rngg");
+  return function _callee(dispatch) {
+    return regeneratorRuntime.async(function _callee$(_context) {
+      while (1) {
+        switch (_context.prev = _context.next) {
+          case 0:
+            console.log("Rngg");
+            _context.next = 3;
+            return regeneratorRuntime.awrap(_Firebase.auth.signInWithEmailAndPassword(Email, password).then(function (auth) {
+              // Logged in set forms display to none.
+              console.log(auth);
+              dispatch({
+                type: _actionTypes.SET_USER,
+                user: auth
+              });
+              history.push("/dashboard");
+            })["catch"](function (err) {
+              console.log(err.message, err);
 
-    _Firebase.auth.signInWithEmailAndPassword(Email, password).then(function (auth) {
-      // Logged in set forms display to none.
-      console.log(auth);
-      dispatch({
-        type: _actionTypes.SET_USER,
-        user: auth
-      });
-      history.push("/dashboard");
-    })["catch"](function (err) {
-      console.log(err.message, err);
+              if (err.code === "auth/invalid-email") {
+                setError(function (state) {
+                  return _objectSpread({}, state, {
+                    Email: true
+                  });
+                });
+              } else if (err.code === "auth/wrong-password") {
+                setError(function (state) {
+                  return _objectSpread({}, state, {
+                    Password: true
+                  });
+                });
+              } else if (err.code === "auth/too-many-requests") {
+                setError(function (state) {
+                  return _objectSpread({}, state, {
+                    toMany: true
+                  });
+                });
+              }
+            }));
 
-      if (err.code === "auth/invalid-email") {
-        setError(function (state) {
-          return _objectSpread({}, state, {
-            Email: true
-          });
-        });
-      } else if (err.code === "auth/wrong-password") {
-        setError(function (state) {
-          return _objectSpread({}, state, {
-            Password: true
-          });
-        });
+          case 3:
+          case "end":
+            return _context.stop();
+        }
       }
     });
   };

@@ -1,10 +1,10 @@
 import React from 'react';
 import CircularProgress from '@material-ui/core/CircularProgress';
 
-export default function CircularUnderLoad() {
+export default function CircularUnderLoad({absolute}) {
     return (
         <div style={{
-            position: "fixed",
+            position: absolute ? "absolute" : "fixed",
             top: 0,
             right: 0,
             left: 0,

@@ -1,7 +1,7 @@
 import mysql from "mysql"
 
 export const db = mysql.createPool({
-    host: "127.0.0.1",
+    host: "localhost",
     port: 3306,
     user: "root",
     password: "password",
@@ -9,7 +9,7 @@ export const db = mysql.createPool({
 })
 
 export const connection = mysql.createConnection({
-    host: "127.0.0.1",
+    host: "localhost",
     port: 3306,
     user: "root",
     password: "password",

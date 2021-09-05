@@ -1,5 +1,16 @@
 import { db } from "../config/index.js";
 
+function getRandomString(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for (var i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() *
+            charactersLength));
+    }
+    return result;
+}
+
 export const addProduct = (productName,
     productBarcode,
     productExpiry,
@@ -10,6 +21,7 @@ export const addProduct = (productName,
     discount,
     profitPercent,
     register_date,
+    productImagePath,
     res
 ) => {
 
@@ -18,10 +30,12 @@ export const addProduct = (productName,
         return;
     }
 
+    const barcode = getRandomString(8)
+
     const sqlInsertProduct = (id) =>
         `INSERT INTO products 
-    (product_id, product_name, ${productBarcode ? `product_barcode,` : ""} product_expiry, parent_id, register_date, subcat_id) VALUES 
-    (${id}, '${productName}', '${productBarcode ? `${productBarcode},` : ""}' '${productExpiry}', ${productCatagory}, '${register_date}', ${subCatId});`
+    (product_id, product_name, ${barcode ? `product_barcode,` : ""} product_expiry, parent_id, register_date, subcat_id, product_image) VALUES 
+    (${id}, '${productName}', ${barcode ? `'${barcode}',` : ""} '${productExpiry}', ${productCatagory}, '${register_date}', ${subCatId}, '${productImagePath}');`
 
     const sqlGetProductCount = `SELECT COUNT(*) FROM inventorysystem.products;`
 
@@ -45,8 +59,15 @@ export const addProduct = (productName,
                     db.query(sqlInsertPrice(id), (err, resolve) => {
                         res.send({
                             success: true,
-                            message: "Added Successfully"
+                            message: "Added Successfully",
+                            barcode,
+                            id,
                         })
+                    })
+                } else if (err?.errno === 1062) {
+                    res.send({
+                        msg: "Product Already Exists",
+                        error: err,
                     })
                 } else {
                     res.send(err ? err : resolve)
@@ -59,6 +80,26 @@ export const addProduct = (productName,
             res.send(err ? err : resolve)
         }
     })
+}
+
+export const addProductBarcode = (req, res) => {
+
+    const { barcode, productId } = req
+
+    const sqlInsertProductBarcode =
+        `UPDATE inventorysystem.products SET product_barcode="${barcode}" WHERE product_id=${productId};`
+
+    db.query(sqlInsertProductBarcode, (err, resolve) => {
+        if (!err && resolve) {
+            res.send({
+                success: true,
+                message: "Updated Successfully",
+            })
+        } else {
+            res.status(400).json({ msg: "Bad Request", err: err })
+        }
+    })
+
 }
 
 
@@ -268,13 +309,17 @@ export const searchProducts = (
     limit,
     res
 ) => {
+
     const sqlGetTimelineProducts =
-        `SELECT * FROM inventorysystem.products WHERE YEAR(register_date)${min && max ? ` between ${min} and ${max}` : ""}
-    ${cat ? `AND parent_id = ${cat}` : ""}
-    ${search && search?.length > 0 && search !== "" ? `AND product_name LIKE '%${search}%'` : ""}
-    ORDER BY ${orderBy ? orderBy : "product_id"} ${desc ? "DESC" : "ASC"}
-    ${limit && ` LIMIT ${limit}`}
-    ;`
+        `SELECT * FROM inventorysystem.products
+        INNER JOIN inventorysystem.product_price
+        ON products.product_id = product_price.pp_productId
+        WHERE YEAR(register_date)${min && max ? ` between ${min} and ${max}` : ""}
+        ${cat ? `AND parent_id = ${cat}` : ""}
+        ${search && search?.length > 0 && search !== "" ? `AND product_name LIKE '%${search}%'` : ""}
+        ORDER BY ${orderBy ? orderBy : "product_id"} ${desc ? "DESC" : "ASC"}
+        ${limit ? ` LIMIT ${limit}` : ""}
+        ;`
 
 
     db.query(sqlGetTimelineProducts, (err, products) => {

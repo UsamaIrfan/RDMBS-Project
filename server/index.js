@@ -3,16 +3,21 @@ import bodyParser from "body-parser"
 import mysql from "mysql"
 import cors from "cors"
 import url from 'url'
+import fileUpload from "express-fileupload"
+import path from "path";
+import { fileURLToPath } from 'url';
 import { db, connection } from "./config/index.js"
-import { DELETE, GET } from "./routes.js"
+import { DELETE, GET, PUT } from "./routes.js"
 import { getSales, insertSale } from "./actions/Sales.js"
-import { addProduct, delProduct, getProduct, getProductCount, getProducts, getProductsByTimeline, getProductTimeLine, productByCatagory, searchProducts } from "./actions/Products.js"
+import { addProduct, addProductBarcode, delProduct, getProduct, getProductCount, getProducts, getProductsByTimeline, getProductTimeLine, productByCatagory, searchProducts } from "./actions/Products.js"
 import { addCatagory, delCatagory, getCatagory, getCats, getSubCatagories } from "./actions/Catagories.js"
+import { verifyUser } from "./actions/User.js"
 
 const app = express()
 
 app.use(cors())
 app.use(express.json())
+app.use(fileUpload())
 app.use(bodyParser.urlencoded({ extended: true }))
 
 app.get("/", (req, res) => {
@@ -33,6 +38,7 @@ app.post("/api/addproduct", (req, res) => {
     const discount = req.body.discount
     const profitPercent = req.body.profitPercent
     const register_date = req.body.register_date
+    const productImagePath = req.body.productImagePath
 
     addProduct(productName,
         productBarcode,
@@ -44,9 +50,9 @@ app.post("/api/addproduct", (req, res) => {
         discount,
         profitPercent,
         register_date,
+        productImagePath,
         res
     )
-
 
 })
 
@@ -210,6 +216,14 @@ app.get(GET.GET_SALE, (req, res) => {
 
 })
 
+app.put(PUT.UPDATE_BARCODE, (req, res) => {
+
+    const id = req.query.id
+
+    addProductBarcode(req, res)
+
+})
+
 
 app.get(GET.GET_SALES_TIMELINE, (req, res) => {
 
@@ -258,6 +272,76 @@ app.post("/api/insertsale", (req, res) => {
         products,
         res,
     )
+
+})
+
+app.post('/api/addProfile', (req, res) => {
+    if (req.files === null) {
+        return res.status(400).json({ msg: "No file uploaded." })
+    }
+
+    const file = req.files.file;
+
+    file.mv(`public/userProfiles/${file.name}`, err => {
+        if (err) {
+            console.log(err)
+            return res.status(500).send(err)
+        }
+
+        res.json({ fileName: file.name, filePath: `/profiles/${file.name}` })
+    })
+
+});
+
+app.post('/api/addProductImage', (req, res) => {
+    if (req.files === null) {
+        return res.status(400).json({ msg: "No file uploaded." })
+    }
+
+    const file = req.files.file;
+
+    file.mv(`public/images/${file.name}`, err => {
+        if (err) {
+            console.log(err)
+            return res.status(500).send(err)
+        }
+
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+
+        res.json({ fileName: file.name, filePath: `/images/${file.name}` })
+    })
+
+});
+
+app.get('/images/:imageName', (req, res) => {
+
+    const { imageName } = req.params;
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    res.sendFile(path.join(__dirname + `/public/images/${imageName}`))
+
+})
+
+app.get('/profiles/:imageName', (req, res) => {
+
+    const { imageName } = req.params;
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    res.sendFile(path.join(__dirname + "/public/userProfiles/Schema1.png"))
+
+})
+
+
+app.post('/api/login', (req, res) => {
+
+    const { userName } = req.body
+
+    verifyUser(userName, res)
 
 })
 

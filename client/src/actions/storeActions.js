@@ -8,9 +8,9 @@ var googleprovider = new firebase.auth.GoogleAuthProvider();
 
 export const login = (Email, password, setError, history) => {
     // login Logic
-    return (dispatch) => {
+    return async (dispatch) => {
         console.log("Rngg")
-        auth.signInWithEmailAndPassword(Email, password)
+        await auth.signInWithEmailAndPassword(Email, password)
             .then((auth) => {
                 // Logged in set forms display to none.
                 console.log(auth)
@@ -26,6 +26,8 @@ export const login = (Email, password, setError, history) => {
                     setError(state => ({ ...state, Email: true }))
                 } else if (err.code === "auth/wrong-password") {
                     setError(state => ({ ...state, Password: true }))
+                } else if (err.code === "auth/too-many-requests") {
+                    setError(state => ({ ...state, toMany: true }))
                 }
             })
     }
