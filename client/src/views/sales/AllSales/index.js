@@ -259,7 +259,7 @@ const Products = () => {
                 'Sale_date':
                   (date) => (
                     <td>
-                      {moment(date).format("LL")}
+                      {moment(date?.Sale_date).format("LL")}
                     </td>
                   ),
                 'Sale_status':

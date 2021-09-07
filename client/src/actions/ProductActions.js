@@ -307,7 +307,7 @@ export const searchProducts = (minYear, maxYear, catId, orderBy, searchKeywords)
     }
 }
 
-export const uploadProductImage = (image, setUploaded, setuploadProgress, UploadedImages) => {
+export const uploadProductImage = (image, setUploaded, setuploadProgress, UploadedImages, CoverImage, setCoverImage) => {
     var formData = new FormData();
     formData.append('file', image);
     return (dispatch) => {
@@ -323,6 +323,9 @@ export const uploadProductImage = (image, setUploaded, setuploadProgress, Upload
             },
         )
             .then(({ data }) => {
+                if (UploadedImages?.length === 0) {
+                    setCoverImage(`${data.filePath}`)
+                }
                 setUploaded(UploadedImages.concat({
                     type: image.type,
                     size: image.size,

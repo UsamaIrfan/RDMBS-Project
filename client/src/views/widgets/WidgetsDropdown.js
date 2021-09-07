@@ -101,7 +101,7 @@ const WidgetsDropdown = ({products, revenueData, revenue}) => {
       <CCol sm="12" lg="4">
         <CWidgetDropdown
           color="gradient-warning"
-          header="9.823"
+          header="370 Users"
           text="Traffic This Year"
           footerSlot={
             <ChartLineSimple

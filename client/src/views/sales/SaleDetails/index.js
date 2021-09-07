@@ -7,6 +7,7 @@ import { SERVER_API } from 'src/actions/actionTypes';
 import { useDispatch, useSelector } from 'react-redux';
 import SweetAlert from 'react-bootstrap-sweetalert';
 import { delProduct } from 'src/actions/ProductActions';
+import moment from 'moment'
 
 const Product = ({ match }) => {
   const history = useHistory()
@@ -95,12 +96,21 @@ const Product = ({ match }) => {
               <tbody>
                 {
                   saleDetails.map(([key, value], index) => {
-                    return (
-                      <tr key={index.toString()}>
-                        <td>{`${key}:`}</td>
-                        <td><strong>{value}</strong></td>
-                      </tr>
-                    )
+                    if (key === "Sale_date") {
+                      return (
+                        <tr key={index.toString()}>
+                          <td>{`${key}:`}</td>
+                          <td><strong>{moment(value).format("LL")}</strong></td>
+                        </tr>
+                      )
+                    } else {
+                      return (
+                        <tr key={index.toString()}>
+                          <td>{`${key}:`}</td>
+                          <td><strong>{value}</strong></td>
+                        </tr>
+                      )
+                    }
                   })
                 }
               </tbody>

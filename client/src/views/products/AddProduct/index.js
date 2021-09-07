@@ -51,7 +51,7 @@ function AddProduct() {
     const [ImageLoading, setImageLoading] = React.useState(false)
     const [UploadedImages, setUploadedImages] = React.useState([])
     const [ShowSuccess, setShowSuccess] = React.useState(false)
-    const [CoverImage, setCoverImage] = React.useState(UploadedImages?.[0]?.fileName)
+    const [CoverImage, setCoverImage] = React.useState([UploadedImages?.[0]?.fileName])
     const [ShowFail, setShowFail] = React.useState(false)
     const [ErrorMessage, setErrorMessage] = React.useState()
     const [ShowBarcode, setShowBarcode] = React.useState(false)
@@ -137,12 +137,16 @@ function AddProduct() {
 
     const onImageChange = async (event) => {
         if (event.target.files.length) {
-            await dispatch(uploadProductImage(event.target.files[0], setUploadedImages, setuploadProgress, UploadedImages))
+            await dispatch(uploadProductImage(event.target.files[0], setUploadedImages, setuploadProgress, UploadedImages, CoverImage, setCoverImage))
         }
     }
 
     const removeProductImage = (imagePath) => {
-        setUploadedImages(UploadedImages.filter(i => i.filePath !== imagePath))
+        const filtered = UploadedImages.filter(i => i.filePath !== imagePath)
+        if (filtered.length === 1) {
+            setCoverImage(filtered[0].filePath)
+        }
+        setUploadedImages(filtered)
     }
 
     return (
@@ -305,34 +309,6 @@ function AddProduct() {
                                             shape="pill"
                                             onChange={() => { }}
                                         />
-                                    </CCol>
-                                </CFormGroup>
-                                <CFormGroup row>
-                                    <CCol md="3">
-                                        <CLabel>Attributes</CLabel>
-                                    </CCol>
-                                    <CCol md="9">
-                                        <CFormGroup variant="custom-checkbox" inline>
-                                            <CInputCheckbox
-                                                custom
-                                                id="inline-checkbox1"
-                                                name="inline-checkbox1"
-                                                value="option1"
-                                            />
-                                            <CLabel variant="custom-checkbox" htmlFor="inline-checkbox1">Wearables</CLabel>
-                                        </CFormGroup>
-                                        <CFormGroup variant="custom-checkbox" inline>
-                                            <CInputCheckbox custom id="inline-checkbox2" name="inline-checkbox2" value="option2" />
-                                            <CLabel variant="custom-checkbox" htmlFor="inline-checkbox2">Beauty</CLabel>
-                                        </CFormGroup>
-                                        <CFormGroup variant="custom-checkbox" inline>
-                                            <CInputCheckbox custom id="inline-checkbox3" name="inline-checkbox3" value="option3" />
-                                            <CLabel variant="custom-checkbox" htmlFor="inline-checkbox3">Edible</CLabel>
-                                        </CFormGroup>
-                                        <CFormGroup variant="custom-checkbox" inline>
-                                            <CInputCheckbox custom id="inline-checkbox3" name="inline-checkbox3" value="option3" />
-                                            <CLabel variant="custom-checkbox" htmlFor="inline-checkbox3">Not for children</CLabel>
-                                        </CFormGroup>
                                     </CCol>
                                 </CFormGroup>
                                 <CFormGroup row>

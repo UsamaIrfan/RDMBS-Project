@@ -79,9 +79,9 @@ const AllCatagories = () => {
               onRowClick={(item) => history.push(`/catagories/${item.categories_id}`)}
               scopedSlots={{
                 'register_date':
-                  (date) => (
+                  (obj) => (
                     <td>
-                      {moment(date).format("LL")}
+                      {moment(obj.register_date).format("LL")}
                     </td>
                   ),
                 'isActive':

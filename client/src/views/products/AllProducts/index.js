@@ -256,10 +256,11 @@ const Products = () => {
               clickableRows
               onRowClick={(item) => history.push(`/products/${item.product_id}`)}
               scopedSlots={{
-                'register_date': (date) =>
-                (<td>
-                  {moment(date).format("LL")}
-                </td>),
+                'register_date': (item) => {
+                  return (<td>
+                    {moment(item?.register_date).format("LL")}
+                  </td>)
+                },
                 'status':
                   (item) => (
                     <td>

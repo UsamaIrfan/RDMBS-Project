@@ -92,7 +92,7 @@ function AddCatagory() {
                     show={ShowSuccess}
                     onConfirm={() => setShowSuccess(false)}
                 >
-                    Product Added
+                    Catagory Added
                 </SweetAlert>
                 <SweetAlert
                     danger
@@ -100,7 +100,7 @@ function AddCatagory() {
                     show={ShowFail}
                     onConfirm={() => setShowFail(false)}
                 >
-                    Unable to Add Product
+                    Unable to Add Catagory
                 </SweetAlert>
                 <CCard>
                     <CCardHeader>

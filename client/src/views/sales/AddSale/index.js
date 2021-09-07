@@ -319,7 +319,7 @@ function AddProduct() {
                     </div>
                 </CModalBody>
                 <CModalFooter>
-                    <CButton color="primary" onClick={() => setLarge(!large)}>{IsScanning ? 'Open' : 'Close'} Camera</CButton>{' '}
+                    <CButton color="primary" onClick={() => setIsScanning(!IsScanning)}>{IsScanning ? 'Close' : 'Open'} Camera</CButton>{' '}
                     <CButton color="secondary" onClick={() => setLarge(!large)}>Cancel</CButton>
                 </CModalFooter>
             </CModal>

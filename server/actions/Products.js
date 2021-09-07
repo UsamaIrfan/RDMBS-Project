@@ -181,8 +181,8 @@ export const addProduct = (
 
     const sqlInsertProduct = (id) =>
         `INSERT INTO products 
-    (product_id, product_name, ${barcode ? `product_barcode,` : ""} product_expiry, parent_id, register_date, subcat_id, product_image) VALUES 
-    (${id}, '${productName}', ${barcode ? `'${barcode}',` : ""} '${productExpiry}', ${productCatagory}, '${register_date}', ${subCatId}, '${productImagePath}');`
+    (product_id, product_name, ${barcode ? `product_barcode,` : ""} ${productExpiry ? "product_expiry," : ""} parent_id, register_date, subcat_id, product_image) VALUES 
+    (${id}, '${productName}', ${barcode ? `'${barcode}',` : ""} ${productExpiry ? `'${productExpiry}',` : ""} ${productCatagory}, '${register_date}', ${subCatId}, '${productImagePath}');`
 
 
     const sqlGetProductCount = `SELECT COUNT(*) FROM inventorysystem.products;`
