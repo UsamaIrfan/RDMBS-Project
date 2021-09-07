@@ -1,5 +1,10 @@
 export const GET = {
     GET_PRODUCTS: "/api/getproducts",
+    DASHBOARD_DATA: "/api/dashboard",
+    GET_PRODUCT_BY_ID_MULTIPLE: "/api/getmultiProducts",
+    PRODUCT_ADDED_PER_MONTH: "/api/dashboard/stockPerMonth",
+    GET_PRODUCT_BY_BARCODE: "/api/getProductbyBarcode",
+    GET_SALE_PRODUCTS_BY_ID: "/api/sales/products",
     PRODUCT_COUNT: "/api/getproductcount",
     CAT_PRODUCTS: "/api/getcatproducts",
     GET_PRODUCT: "/api/getproduct",
@@ -11,6 +16,7 @@ export const GET = {
     GET_SALES: "/api/getsales",
     GET_SALE:"/api/getsaleId",
     GET_SALES_TIMELINE:"/api/getSalesTimeline",
+    SALES_BY_MONTH: "/api/sales/monthly",
 }
 
 export const PUT = {

@@ -36,6 +36,7 @@ import { withStyles } from '@material-ui/core/styles';
 import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
 import { Button } from '@material-ui/core'
+import moment from 'moment'
 
 
 const getBadge = status => {
@@ -255,6 +256,10 @@ const Products = () => {
               clickableRows
               onRowClick={(item) => history.push(`/products/${item.product_id}`)}
               scopedSlots={{
+                'register_date': (date) =>
+                (<td>
+                  {moment(date).format("LL")}
+                </td>),
                 'status':
                   (item) => (
                     <td>
@@ -262,7 +267,7 @@ const Products = () => {
                         {'In Stock'}
                       </CBadge>
                     </td>
-                  )
+                  ),
               }}
             />
             {NumberOfPages && <CPagination

@@ -27,7 +27,7 @@ import {
     CSwitch
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { addProduct, addSale, searchProducts } from '../../../actions/ProductActions'
+import { addProduct, addSale, getProductByBarcode, searchProducts } from '../../../actions/ProductActions'
 import { useSelector } from 'react-redux';
 import moment from "moment";
 import SweetAlert from 'react-bootstrap-sweetalert';
@@ -41,6 +41,7 @@ import BarcodeReader from 'react-barcode-reader'
 import AsyncSelect from 'react-select/async';
 import Scanner from 'src/reusable/BarCodeScanner'
 import Result from 'src/reusable/Result'
+import ReactToPrint from 'react-to-print'
 
 function AddProduct() {
     const [ProductName, setProductName] = React.useState("")
@@ -59,6 +60,9 @@ function AddProduct() {
     const [Total, setTotal] = React.useState(0)
     const [ScannedData, setScannedData] = React.useState([])
     const [IsScanning, setIsScanning] = React.useState()
+    const [ShowReciept, setShowReciept] = React.useState(false)
+    const [isRecieptPrinted, setisBarCodePrinted] = React.useState(false)
+    const [NoPrintConfirmAlert, setNoPrintConfirmAlert] = React.useState(false)
     const [SelectedProducts, setSelectedProducts] = React.useState([])
     const [ShowProductList, setShowProductList] = React.useState(false)
     const [ListLoading, setListLoading] = React.useState(true)
@@ -182,9 +186,32 @@ function AddProduct() {
         setTotal(total)
     }
 
-    const onDetected = result => {
+    const componentRef = React.useRef();
+
+
+    const onDetected = async  result => {
         // this.setState({ results: this.state.results.concat([result]) })
-        setScannedData(result.codeResult.code)
+        await getProductByBarcode(result.codeResult.code)
+    }
+
+    const getProductByBarcode = (barcode) => {
+
+        return (dispatch) => {
+            axios.get(`${SERVER_API}/api/getProductbyBarcode?${barcode ? `barcode=${barcode}` : ""}`,
+                {
+                    headers: { "Content-Type": "application/json" },
+                }
+            )
+                .then(({ data }) => {
+                    if (data.success === true) {
+                        setSelectedProducts([...SelectedProducts, data.product])
+                    }
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        }
+    
     }
 
     const onSubmitHandler = async () => {
@@ -195,9 +222,9 @@ function AddProduct() {
             amountReturned: Total < AmountGiven ? Math.abs(Total - AmountGiven) : 0,
             date: moment(new Date()).format("YYYY/MM/DD"),
             failAlert: setShowFail,
-            successAlert: setShowSuccess,
+            successAlert: setShowReciept,
             paytype: "cash",
-            products: ListItems,
+            products: SelectedProducts,
             status: "completed",
             totalDiscount: 0,
         }))
@@ -205,6 +232,75 @@ function AddProduct() {
 
     return (
         <>
+            <SweetAlert
+                info
+                title="Print Reciept!"
+                onConfirm={() => setShowReciept(false)}
+                onCancel={() => setShowReciept(false)}
+                dependencies={[]}
+                closeOnClickOutside={false}
+                show={ShowReciept}
+                customButtons={
+                    <React.Fragment>
+                        <CButton className="btn btn-danger ml-1 mr-3" onClick={() => setNoPrintConfirmAlert(true)}>Add Product wih no Barcode</CButton>
+                        <CButton disabled={!isRecieptPrinted} className="btn btn-primary ml-1 mr-1" onClick={() => { setShowReciept(false) }}>Confirm</CButton>
+                    </React.Fragment>
+                }
+            >
+                <div>
+                    <div ref={componentRef} className="barcode-reciept">
+                        <h3 className="mb-4">UZ Inventory</h3>
+                        <div>
+                            <table className="table table-bordered">
+                                <thead>
+                                    <th>Product Name</th>
+                                    <th>Product Price</th>
+                                </thead>
+                                <tbody>
+                                    {SelectedProducts?.map((i, idx) => (
+                                        <tr key={idx}>
+                                            <td>{i?.product_name}</td>
+                                            <td className="text-left">Rs {i?.pp_sellingPrice}</td>
+                                        </tr>
+                                    ))}
+                                    <tr>
+                                        <td className="font-weight-bold">Total</td>
+                                        <td className="text-left font-weight-bold mt-4 ml-3">Rs {Total}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Amount Given</td>
+                                        <td className="text-left font-weight-bold mt-4 ml-3">Rs {AmountGiven}</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Amount Returned</td>
+                                        <td className="text-left font-weight-bold mt-4 ml-3">Rs {Total < AmountGiven ? Math.abs(AmountGiven - Total) : 0}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <ReactToPrint
+                        onAfterPrint={() => setisBarCodePrinted(true)}
+                        onPrintError={() => setisBarCodePrinted(true)}
+                        trigger={() => <CButton className="btn btn-primary ml-1 mt-2 mr-3">Print</CButton>}
+                        content={() => componentRef.current}
+                    />
+                </div>
+            </SweetAlert>
+            <SweetAlert
+                warning
+                showCancel
+                show={NoPrintConfirmAlert}
+                confirmBtnText="Yes Proceed"
+                confirmBtnBsStyle="danger"
+                title="Are you sure?"
+                onConfirm={() => { setNoPrintConfirmAlert(false); setShowReciept(false) }}
+                onCancel={() => setNoPrintConfirmAlert(false)}
+                closeOnClickOutside={false}
+                focusCancelBtn
+            >
+                You won't be able to track this product with barcodes.
+            </SweetAlert>
             <CModal
                 show={large}
                 onClose={() => setLarge(!large)}
@@ -215,9 +311,7 @@ function AddProduct() {
                 </CModalHeader>
                 <CModalBody>
                     <div>
-                        <button onClick={() => setIsScanning(!IsScanning)}>
-                            {IsScanning ? 'Stop' : 'Start'}
-                        </button>
+                        <h3>Camera</h3>
                         <ul className="results">
                             <p>{ScannedData ? ScannedData : ""}</p>
                         </ul>
@@ -225,7 +319,7 @@ function AddProduct() {
                     </div>
                 </CModalBody>
                 <CModalFooter>
-                    <CButton color="primary" onClick={() => setLarge(!large)}>Do Something</CButton>{' '}
+                    <CButton color="primary" onClick={() => setLarge(!large)}>{IsScanning ? 'Open' : 'Close'} Camera</CButton>{' '}
                     <CButton color="secondary" onClick={() => setLarge(!large)}>Cancel</CButton>
                 </CModalFooter>
             </CModal>
@@ -324,7 +418,7 @@ function AddProduct() {
                             </CForm>
                         </CCardBody>
                         <CCardFooter>
-                            <CButton className="mr-2" type="submit" size="sm" color="primary" onClick={onSubmitHandler}><CIcon name="cil-scrubber" /> Submit</CButton>
+                            <CButton disabled={!AmountGiven || AmountGiven < Total} className="mr-2" type="submit" size="sm" color="primary" onClick={onSubmitHandler}><CIcon name="cil-scrubber" /> Submit</CButton>
                             <CButton type="reset" size="sm" color="danger" onClick={() => resetFunc()}><CIcon name="cil-ban" /> Reset</CButton>
                         </CCardFooter>
                     </CCard>

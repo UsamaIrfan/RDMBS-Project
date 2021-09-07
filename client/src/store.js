@@ -1,6 +1,6 @@
 import { createStore, applyMiddleware } from 'redux'
 import thunk from 'redux-thunk';
-import { SET_USER, GET_PRODUCTS, GET_CATAGORIES, GET_SALES } from "./actions/actionTypes";
+import { SET_USER, GET_PRODUCTS, GET_CATAGORIES, GET_SALES, GET_DASHBOARD_SALES_DATA, GET_DASHBOARD_INITIALS, GET_PRODUCTS_ADDED_MONTHLY } from "./actions/actionTypes";
 
 const initialState = {
   sidebarShow: 'responsive',
@@ -8,6 +8,14 @@ const initialState = {
   products: [],
   catagories: [],
   sales: [],
+  dashboardSales: [],
+  dashboardInitials: {
+    products: 2,
+    catagories: 0,
+    sales: 0,
+    revenue: 0
+  },
+  productPerMonth: []
 }
 
 const changeState = (state = initialState, action) => {
@@ -23,6 +31,12 @@ const changeState = (state = initialState, action) => {
       return { ...state, catagories: action.catagories }
     case GET_SALES:
       return { ...state, sales: action.sales }
+    case GET_DASHBOARD_SALES_DATA:
+      return { ...state, saldashboardSaleses: action.data }
+    case GET_DASHBOARD_INITIALS:
+      return { ...state, dashboardInitials: action.data }
+    case GET_PRODUCTS_ADDED_MONTHLY:
+      return { ...state, productPerMonth: action.data }
     default:
       return state
   }

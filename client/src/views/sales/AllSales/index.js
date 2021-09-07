@@ -37,6 +37,9 @@ import Slider from '@material-ui/core/Slider';
 import Typography from '@material-ui/core/Typography';
 import { Button } from '@material-ui/core'
 import { getAllSales } from 'src/actions/Sales'
+import moment from 'moment'
+import SweetAlert from 'react-bootstrap-sweetalert'
+import ReactToPrint from 'react-to-print'
 
 
 const getBadge = status => {
@@ -64,7 +67,10 @@ const Products = () => {
   const [NumberOfPages, setNumberOfPages] = useState(null)
   const [NUMBER_OF_SALES_PER_SCREEN, setNUMBER_OF_SALES_PER_SCREEN] = useState(10)
   const [SelectedCatagory, setSelectedCatagory] = useState()
+  const [ShowReciept, setShowReciept] = React.useState(false)
   const [ProductsOrderBy, setProductsOrderBy] = useState("product_id")
+  const [isRecieptPrinted, setisBarCodePrinted] = React.useState(false)
+  const [NoPrintConfirmAlert, setNoPrintConfirmAlert] = React.useState(false)
   const [ShowSearch, setShowSearch] = useState(false)
   const [Keywords, setKeywords] = React.useState("")
 
@@ -72,7 +78,6 @@ const Products = () => {
   const products = useSelector(state => state.sales)
   const catagories = useSelector(state => state.catagories)
 
-  console.log("PRODS",products)
 
   // Page Change Handler ===============>
   const pageChange = newPage => {
@@ -135,6 +140,7 @@ const Products = () => {
   const handleChange = (event, newValue) => {
     setRangeValue(newValue);
   };
+
 
   const searchHandler = async () => {
     setIsLoading(true)
@@ -250,6 +256,12 @@ const Products = () => {
               clickableRows
               onRowClick={(item) => history.push(`/sales/${item.Sale_Id}`)}
               scopedSlots={{
+                'Sale_date':
+                  (date) => (
+                    <td>
+                      {moment(date).format("LL")}
+                    </td>
+                  ),
                 'Sale_status':
                   (item) => (
                     <td>

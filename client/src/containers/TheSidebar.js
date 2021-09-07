@@ -32,12 +32,12 @@ const TheSidebar = () => {
           name="logo-negative"
           height={35}
         /> */}
-        {/* <CIcon
+        <CIcon
           className="c-sidebar-brand-minimized"
           name="sygnet"
           height={35}
-        /> */}
-        <h3>Inventory</h3>
+        />
+        <h3 className="c-sidebar-brand-full">Inventory Core</h3>
       </CSidebarBrand>
       <CSidebarNav>
 

@@ -1,20 +1,21 @@
 import axios from "axios";
-import { GET_PRODUCTS, SERVER_API } from "./actionTypes";
+import { GET_PRODUCTS, GET_PRODUCTS_ADDED_MONTHLY, SERVER_API } from "./actionTypes";
 
-export const addProduct = (name, catagory, subCatId, expiry, price, buyPrice, barcode, discount, profitPercent, register_date, UploadedImage, success, fail, setErrorMessage, setProductId, setProductBarcode) => {
+export const addProduct = (name, catagory, subCatId, expiry, price, buyPrice, barcode, discount, profitPercent, register_date, UploadedImages, success, fail, setErrorMessage, setProductId, setProductBarcode, CoverImage) => {
 
     const postData = {
         productName: name,
         barcode: barcode,
         expiry: expiry,
-        productImagePath: UploadedImage.pathOnly,
+        productImagePath: CoverImage,
         subCatId: subCatId,
         catagoryId: catagory,
         productPrice: price,
         buyPrice: buyPrice,
         discount: discount,
         profitPercent: profitPercent,
-        register_date: register_date
+        register_date: register_date,
+        images: UploadedImages,
     }
 
     return (dispatch) => {
@@ -32,6 +33,32 @@ export const addProduct = (name, catagory, subCatId, expiry, price, buyPrice, ba
                     fail(true)
                     setErrorMessage(data?.msg)
                     console.log(data)
+                }
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
+}
+
+export const productsAddedPerMonth = ({setStockUpdateData, year}) => {
+
+    return (dispatch) => {
+        axios.get(`${SERVER_API}/api/dashboard/stockPerMonth${year ? `year=${year}` : ""}`,
+            {
+                headers: { "Content-Type": "application/json" },
+            }
+        )
+            .then(({ data }) => {
+                if (data.success === true) {
+                    const result = data.data
+                    dispatch({
+                        type: GET_PRODUCTS_ADDED_MONTHLY,
+                        data: result
+                    })
+                    const array = new Array(12).fill(0)
+                    result.forEach(i => array[i.monthNum - 1] = i.numProducts)
+                    setStockUpdateData(array)
                 }
             })
             .catch((err) => {
@@ -107,32 +134,25 @@ export const addSale = ({ user, date, totalAmount, totalDiscount, amountGiven, a
 
 
 
-// export const addProductBarcode = (payload) => {
+export const getProductByBarcode = (barcode) => {
 
-//     const data = {
-//         barcode: payload.barcode,
-//         productId: payload.productId,
-//     } 
+    return (dispatch) => {
+        axios.get(`${SERVER_API}/api/getProductbyBarcode?${barcode ? `barcode=${barcode}` : ""}`,
+            {
+                headers: { "Content-Type": "application/json" },
+            }
+        )
+            .then(({ data }) => {
+                if (data.success === true) {
+                    return data.product;
+                }
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }
 
-//     return (dispatch) => {
-//         axios.put(`${SERVER_API}/api/updateBarcode`, data,
-//             {
-//                 headers: { "Content-Type": "application/json" },
-//             }
-//         )
-//             .then(({ data }) => {
-//                 if (data.success === true) {
-//                     payload.successAlert(true)
-//                 } else {
-//                     payload.failAlert(true)
-//                 }
-//             })
-//             .catch((err) => {
-//                 console.log(err)
-//             })
-//     }
-
-// }
+}
 
 
 export const addCatagory = (name, isActive, regDate, subCats, successAlert, failAlert) => {
@@ -287,10 +307,9 @@ export const searchProducts = (minYear, maxYear, catId, orderBy, searchKeywords)
     }
 }
 
-export const uploadProductImage = (image, setUploaded, setuploadProgress, setImageLoading) => {
+export const uploadProductImage = (image, setUploaded, setuploadProgress, UploadedImages) => {
     var formData = new FormData();
     formData.append('file', image);
-    setImageLoading(true)
     return (dispatch) => {
         axios.post(`${SERVER_API}/api/addProductImage`, formData,
             {
@@ -304,11 +323,13 @@ export const uploadProductImage = (image, setUploaded, setuploadProgress, setIma
             },
         )
             .then(({ data }) => {
-                setUploaded({
+                setUploaded(UploadedImages.concat({
+                    type: image.type,
+                    size: image.size,
                     fileName: data.fileName,
                     filePath: `${SERVER_API}${data.filePath}`,
                     pathOnly: `${data.filePath}`,
-                })
+                }))
             })
             .catch((err) => {
                 console.log(err)

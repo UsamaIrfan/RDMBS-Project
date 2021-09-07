@@ -8,8 +8,8 @@ import path from "path";
 import { fileURLToPath } from 'url';
 import { db, connection } from "./config/index.js"
 import { DELETE, GET, PUT } from "./routes.js"
-import { getSales, insertSale } from "./actions/Sales.js"
-import { addProduct, addProductBarcode, delProduct, getProduct, getProductCount, getProducts, getProductsByTimeline, getProductTimeLine, productByCatagory, searchProducts } from "./actions/Products.js"
+import { getMonthlySales, getSales, getSalesDetails, insertSale } from "./actions/Sales.js"
+import { addProduct, addProductBarcode, delProduct, getDashboardData, getProduct, getProductByBarcode, getProductCount, getProducts, getProductsByTimeline, getProductsMultiple, getProductTimeLine, getStockUpdateMonthly, productByCatagory, searchProducts } from "./actions/Products.js"
 import { addCatagory, delCatagory, getCatagory, getCats, getSubCatagories } from "./actions/Catagories.js"
 import { verifyUser } from "./actions/User.js"
 
@@ -39,9 +39,9 @@ app.post("/api/addproduct", (req, res) => {
     const profitPercent = req.body.profitPercent
     const register_date = req.body.register_date
     const productImagePath = req.body.productImagePath
+    const imagesList = req.body.images
 
     addProduct(productName,
-        productBarcode,
         productExpiry,
         productCatagory,
         productPrice,
@@ -51,8 +51,31 @@ app.post("/api/addproduct", (req, res) => {
         profitPercent,
         register_date,
         productImagePath,
+        imagesList,
         res
     )
+
+})
+
+app.get(GET.DASHBOARD_DATA, (req, res) => {
+
+    getDashboardData(res)
+
+})
+
+app.get(GET.SALES_BY_MONTH, (req, res) => {
+
+    const year = req.query.year
+
+    getMonthlySales(year, res)
+
+})
+
+app.get(GET.PRODUCT_ADDED_PER_MONTH, (req, res) => {
+
+    const year = req.query.year
+
+    getStockUpdateMonthly(year, res)
 
 })
 
@@ -86,6 +109,29 @@ app.get(GET.GET_PRODUCT, (req, res) => {
 
     getProduct(product_id, res)
 
+})
+
+app.post(GET.GET_PRODUCT_BY_ID_MULTIPLE, (req, res) => {
+
+    const product_ids = req.body.ids
+
+    getProductsMultiple(product_ids, res)
+
+})
+
+app.get(GET.GET_SALE_PRODUCTS_BY_ID, (req, res) => {
+
+    const saleId = req.query.id
+
+    getSalesDetails(saleId, res)
+
+})
+
+app.get(GET.GET_PRODUCT_BY_BARCODE, (req, res) => {
+
+    const barcode = req.query.barcode
+
+    getProductByBarcode(barcode, res)
 })
 
 

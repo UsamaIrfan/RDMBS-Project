@@ -15,3 +15,50 @@
     border: 1px #000 solid;
     border-radius: 3px;
 }
+
+.slick-slide img {
+    margin: 0 auto;
+}
+
+// .slick-dots li {
+//     background-color: #3399ff;
+// }
+
+.carousel-image-icon {
+    position: absolute;
+    top: 15px;
+    right: 10px;
+    cursor: pointer;
+}
+
+.slick-prev:before,
+.slick-next:before
+{
+    font-family: 'slick';
+    font-size: 20px;
+    line-height: 1;
+
+    opacity: .75;
+    color: #3399ff;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.carousel-arrow-left {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 20;
+}
+
+.carousel-arrow-right {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 20;
+}

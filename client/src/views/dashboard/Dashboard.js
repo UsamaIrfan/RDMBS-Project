@@ -1,4 +1,4 @@
-import React, { lazy } from 'react'
+import React, { lazy, useEffect, useState } from 'react'
 import {
   CBadge,
   CButton,
@@ -8,31 +8,165 @@ import {
   CCardFooter,
   CCardHeader,
   CCol,
+  CCardGroup,
   CProgress,
   CRow,
   CCallout
-} from '@coreui/react'
+} from '@coreui/react';
+import {
+  CChartBar,
+  CChartLine,
+  CChartDoughnut,
+  CChartRadar,
+  CChartPie,
+  CChartPolarArea
+} from '@coreui/react-chartjs'
 import CIcon from '@coreui/icons-react'
-
 import MainChartExample from '../charts/MainChartExample.js'
+import { useSelector, useDispatch } from 'react-redux';
+import { getDashboardinitials, getDashboardSales } from 'src/actions/Sales.js';
+
 
 const WidgetsDropdown = lazy(() => import('../widgets/WidgetsDropdown.js'))
 const WidgetsBrand = lazy(() => import('../widgets/WidgetsBrand.js'))
 
 const Dashboard = () => {
+
+  const [MonthDataArray, setMonthDataArray] = useState(new Array(12).fill(0))
+  const [DonutChartData, setDonutChartData] = useState(new Array(12).fill(0))
+
+  const dispatch = useDispatch()
+
+  const salesData = useSelector(state => state.dashboardSales)
+  const user = useSelector(state => state.user)
+  const dashboardInit = useSelector(state => state.dashboardInitials)
+  console.log(dashboardInit)
+
+  useEffect(() => {
+    getInitialData()
+  }, [])
+
+  const getInitialData = async () => {
+    await dispatch(getDashboardinitials())
+    await dispatch(getDashboardSales(setMonthDataArray, setDonutChartData))
+  }
+
   return (
     <>
-      <WidgetsDropdown />
+      <CCol className="text-right mb-4">
+        <h2>Welcome back, <span>{user?.email}</span></h2>
+      </CCol>
+      <CRow>
+        <CCol xs="12" md="6" xl="6">
+          <CRow>
+            <CCol sm="6">
+              <CCallout color="info">
+                <small className="text-muted">Product</small>
+                <br />
+                <strong className="h4">{dashboardInit.products}</strong>
+              </CCallout>
+            </CCol>
+            <CCol sm="6">
+              <CCallout color="danger">
+                <small className="text-muted">Catagories</small>
+                <br />
+                <strong className="h4">{dashboardInit.catagories}</strong>
+              </CCallout>
+            </CCol>
+          </CRow>
+        </CCol>
+        <CCol xs="12" md="6" xl="6">
+          <CRow>
+            <CCol sm="6">
+              <CCallout color="warning">
+                <small className="text-muted">Sales</small>
+                <br />
+                <strong className="h4">{dashboardInit.sales}</strong>
+              </CCallout>
+            </CCol>
+            <CCol sm="6">
+              <CCallout color="success">
+                <small className="text-muted">Revenue</small>
+                <br />
+                <strong className="h4">{dashboardInit.revenue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</strong>
+              </CCallout>
+            </CCol>
+          </CRow>
+        </CCol>
+      </CRow>
 
-      <WidgetsBrand withCharts/>
+      <WidgetsDropdown revenue={dashboardInit.revenue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")} products={dashboardInit.products} revenueData={DonutChartData} />
 
       <CRow>
+        <CCol xs="12" md="6" xl="6">
+          <CCard>
+            <CCardHeader>
+              Sales this year
+            </CCardHeader>
+            <CCardBody>
+              <CChartBar
+                datasets={[
+                  {
+                    label: 'Monthly Sales',
+                    backgroundColor: '#f87979',
+                    data: MonthDataArray
+                  }
+                ]}
+                labels="months"
+                options={{
+                  tooltips: {
+                    enabled: true
+                  }
+                }}
+              />
+            </CCardBody>
+          </CCard>
+        </CCol>
+
+
+        <CCol xs="12" md="6" xl="6">
+          <CCard>
+            <CCardHeader>
+              Revenue This Year
+            </CCardHeader>
+            <CCardBody>
+              <CChartDoughnut
+                datasets={[
+                  {
+                    backgroundColor: [
+                      '#2c3e50',
+                      '#2980b9',
+                      '#27ae60',
+                      '#16a085',
+                      '#f1c40f',
+                      '#c0392b',
+                      '#bdc3c7',
+                      '#95a5a6',
+                      '#9b59b6',
+                      '#ffeaa7',
+                    ],
+                    data: DonutChartData
+                  }
+                ]}
+                labels={['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']}
+                options={{
+                  tooltips: {
+                    enabled: true
+                  }
+                }}
+              />
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
+      {/* <CRow>
         <CCol>
           <CCard>
             <CCardHeader>
               Traffic {' & '} Sales
             </CCardHeader>
-            {/* <CCardBody>
+            <CCardBody>
               <CRow>
                 <CCol xs="12" md="6" xl="6">
 
@@ -69,7 +203,7 @@ const Dashboard = () => {
                   <div className="progress-group mb-4">
                     <div className="progress-group-prepend">
                       <span className="progress-group-text">
-                      Tuesday
+                        Tuesday
                       </span>
                     </div>
                     <div className="progress-group-bars">
@@ -80,7 +214,7 @@ const Dashboard = () => {
                   <div className="progress-group mb-4">
                     <div className="progress-group-prepend">
                       <span className="progress-group-text">
-                      Wednesday
+                        Wednesday
                       </span>
                     </div>
                     <div className="progress-group-bars">
@@ -91,7 +225,7 @@ const Dashboard = () => {
                   <div className="progress-group mb-4">
                     <div className="progress-group-prepend">
                       <span className="progress-group-text">
-                      Thursday
+                        Thursday
                       </span>
                     </div>
                     <div className="progress-group-bars">
@@ -102,7 +236,7 @@ const Dashboard = () => {
                   <div className="progress-group mb-4">
                     <div className="progress-group-prepend">
                       <span className="progress-group-text">
-                      Friday
+                        Friday
                       </span>
                     </div>
                     <div className="progress-group-bars">
@@ -113,7 +247,7 @@ const Dashboard = () => {
                   <div className="progress-group mb-4">
                     <div className="progress-group-prepend">
                       <span className="progress-group-text">
-                      Saturday
+                        Saturday
                       </span>
                     </div>
                     <div className="progress-group-bars">
@@ -124,7 +258,7 @@ const Dashboard = () => {
                   <div className="progress-group mb-4">
                     <div className="progress-group-prepend">
                       <span className="progress-group-text">
-                      Sunday
+                        Sunday
                       </span>
                     </div>
                     <div className="progress-group-bars">
@@ -418,7 +552,7 @@ const Dashboard = () => {
                       <CProgress className="progress-xs" color="info" value="22" />
                     </td>
                     <td className="text-center">
-                      <CIcon height={25} name="cib-google-pay"/>
+                      <CIcon height={25} name="cib-google-pay" />
                     </td>
                     <td>
                       <div className="small text-muted">Last login</div>
@@ -463,10 +597,10 @@ const Dashboard = () => {
                 </tbody>
               </table>
 
-            </CCardBody> */}
+            </CCardBody>
           </CCard>
         </CCol>
-      </CRow>
+      </CRow> */}
     </>
   )
 }

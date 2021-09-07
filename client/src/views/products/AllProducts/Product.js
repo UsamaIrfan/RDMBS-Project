@@ -11,6 +11,7 @@ import JsBarcode from 'jsbarcode';
 import ReactToPrint from 'react-to-print';
 import moment from 'moment';
 import BarCode from 'src/reusable/BarCode';
+import ImageSlider from 'src/reusable/Slider';
 
 const Product = ({ match }) => {
   const history = useHistory()
@@ -52,6 +53,11 @@ const Product = ({ match }) => {
         console.log(err)
       })
   }
+
+  const removeProductImage = (imagePath) => {
+    setproduct({ ...product, images: product.images.filter(image => image.filePath !== imagePath) })
+  }
+
   return (
     <CRow>
       <SweetAlert
@@ -127,7 +133,7 @@ const Product = ({ match }) => {
                           <td><strong>{moment(value).format("LL")}</strong></td>
                         </tr>
                       )
-                    } else {
+                    } else if (key !== "images") {
                       return (
                         <tr key={index.toString()}>
                           <td>{`${key}:`}</td>
@@ -142,9 +148,14 @@ const Product = ({ match }) => {
           </CCardBody>
         </CCard>
       </CCol>
-      {product?.product_image && <CCol lg={3}  sm="12">
+      {product?.product_image && <CCol lg={3} sm="12">
         <img src={`${SERVER_API}${product?.product_image}`} width="100%" height="100%" alt={`${productDetails.product_name}`} style={{ objectFit: "contain", maxHeight: "400px" }} />
       </CCol>}
+      <CCol lg={12}>
+        {product?.images &&
+          <ImageSlider selections={false} removeProductImage={removeProductImage} images={product.images} />
+        }
+      </CCol>
     </CRow>
   )
 }

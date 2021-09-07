@@ -1,6 +1,29 @@
 import { db, connection } from "../config/index.js";
 
 
+export const getSalesDetails = (saleId, res) => {
+    const GetSale =
+        `SELECT * FROM inventorysystem.saledetails
+    WHERE sd_saleId = ${saleId};`
+
+
+    db.query(GetSale, (err, saleProducts) => {
+        if (!err && saleProducts) {
+            res.send({
+                success: true,
+                data: saleProducts,
+            })
+        } else {
+            res.send({
+                success: false,
+                message: "Unable to get sales by Id.",
+                error: err,
+            })
+        }
+    })
+}
+
+
 export const getSales = (id, res) => {
     const GetSale =
         `SELECT * FROM inventorysystem.sales
@@ -60,7 +83,7 @@ export const insertSale = (
         let productsSqlQuery = ""
         if (products.length > 0) {
             products?.forEach((item) => {
-                productsSqlQuery += `(${id}, ${item.product_id}, ${item.quantity}, ${item.pp_sellingPrice}, ${item.pp_discount}),`
+                productsSqlQuery += `(${id}, ${item.product_id}, ${item.quantity ? item.quantity : 0}, ${item.pp_sellingPrice}, ${item.pp_discount}),`
             })
         }
 
@@ -128,3 +151,61 @@ export const insertSale = (
         });
     });
 }
+
+export const getMonthlySales = (year, res) => {
+
+    const sqlGetSalesMonthlyData =`
+    SELECT  year(Sale_date) as year, MONTHNAME(Sale_date) AS month,
+    MONTH(Sale_date) as monthNum,
+    SUM(Sale_totalAmount) as revenue,
+    COUNT(*) as numSales 
+    FROM sales GROUP BY MONTHNAME(Sale_date) 
+    HAVING year = year(${year ? `'${year}'` : "curdate()"}) 
+    ORDER BY MONTH(Sale_date);
+    `
+
+    db.query(sqlGetSalesMonthlyData, (err, salesData) => {
+        if (!err && salesData) {
+            res.send({
+                success: true,
+                data: salesData,
+            })
+        } else {
+            res.status(500).json({
+                success: false,
+                message: "Unable to get sales by month data.",
+                error: err,
+            })
+        }
+    })
+
+}
+
+// export const getMonthlySales = (res) => {
+//     const sqlGetSalesMonthlyData = `
+//     select year(register_date) as year,
+//     monthname(register_date) as month,
+//     month(register_date) as monthNum,
+//     count(*) as numProducts
+//     from products
+//     group by monthname(register_date)
+//     HAVING year = year(curdate())
+// 	order by month(register_date)
+//     `
+
+//     db.query(sqlGetSalesMonthlyData, (err, salesData) => {
+//         if (!err && salesData) {
+//             res.send({
+//                 success: true,
+//                 data: salesData,
+//             })
+//         } else {
+//             res.status(500).json({
+//                 success: false,
+//                 message: "Unable to get sales by month data.",
+//                 error: err,
+//             })
+//         }
+//     })
+
+// }

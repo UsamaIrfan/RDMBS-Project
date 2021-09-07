@@ -32,6 +32,7 @@ import axios from "axios"
 import ReactToPrint from "react-to-print";
 import { motion } from "framer-motion";
 import JsBarcode from 'jsbarcode'
+import ImageSlider from "../../../reusable/Slider";
 
 function AddProduct() {
     const [ProductId, setProductId] = React.useState()
@@ -48,8 +49,9 @@ function AddProduct() {
     const [ProductBarcode, setProductBarcode] = React.useState()
     const [uploadProgress, setuploadProgress] = React.useState(0)
     const [ImageLoading, setImageLoading] = React.useState(false)
-    const [UploadedImage, setUploadedImage] = React.useState()
+    const [UploadedImages, setUploadedImages] = React.useState([])
     const [ShowSuccess, setShowSuccess] = React.useState(false)
+    const [CoverImage, setCoverImage] = React.useState(UploadedImages?.[0]?.fileName)
     const [ShowFail, setShowFail] = React.useState(false)
     const [ErrorMessage, setErrorMessage] = React.useState()
     const [ShowBarcode, setShowBarcode] = React.useState(false)
@@ -103,7 +105,25 @@ function AddProduct() {
     const submitHandler = () => {
         const dateObj = new Date()
         const register_date = moment(dateObj).format("YYYY-MM-DD")
-        dispatch(addProduct(ProductName, parseInt(CatagoryID), parseInt(SubCatID), ExpiryDate, parseInt(ProductPrice), parseInt(BuyPrice), 0, 0, 0, register_date, UploadedImage, setShowBarcode, setShowFail, setErrorMessage, setProductId, setProductBarcode))
+        dispatch(addProduct(
+            ProductName,
+            parseInt(CatagoryID),
+            parseInt(SubCatID),
+            ExpiryDate,
+            parseInt(ProductPrice),
+            parseInt(BuyPrice),
+            0,
+            0,
+            0,
+            register_date,
+            UploadedImages,
+            setShowBarcode,
+            setShowFail,
+            setErrorMessage,
+            setProductId,
+            setProductBarcode,
+            CoverImage,
+        ))
     }
 
     const resetFunc = () => {
@@ -117,8 +137,12 @@ function AddProduct() {
 
     const onImageChange = async (event) => {
         if (event.target.files.length) {
-            await dispatch(uploadProductImage(event.target.files[0], setUploadedImage, setuploadProgress, setImageLoading))
+            await dispatch(uploadProductImage(event.target.files[0], setUploadedImages, setuploadProgress, UploadedImages))
         }
+    }
+
+    const removeProductImage = (imagePath) => {
+        setUploadedImages(UploadedImages.filter(i => i.filePath !== imagePath))
     }
 
     return (
@@ -278,8 +302,8 @@ function AddProduct() {
                                             onClick={() => setInStock(!InStock)}
                                             className="mr-1"
                                             color="primary"
-                                            defaultChecked
                                             shape="pill"
+                                            onChange={() => { }}
                                         />
                                     </CCol>
                                 </CFormGroup>
@@ -334,27 +358,19 @@ function AddProduct() {
                                     <CCol xs="12" md="9">
                                         <CInputFile accept="image/png, image/gif, image/jpeg" onChange={onImageChange} custom id="custom-file-input" />
                                         <CLabel htmlFor="custom-file-input" variant="custom-file">
-                                            Choose file...
+                                            Choose Image...
                                         </CLabel>
                                     </CCol>
                                 </CFormGroup>
                                 {uploadProgress !== 0 && <CProgress value={uploadProgress} className="mb-3" style={{ height: "5px" }} />}
-                                <CCol xs={12} xl={6} md={6} lg={6} col md={8} className={`mt-4 image-container ${UploadedImage || ImageLoading ? "" : "d-none"}`}>
-                                    {UploadedImage &&
-                                        <img
-                                            class="img-fluid"
-                                            src={UploadedImage.filePath}
-                                            alt={UploadedImage.fileName}
-
-                                            onLoad={() => setImageLoading(false)}
-                                        />
-                                    }
-                                    {ImageLoading && <Loader absolute />}
-                                </CCol>
+                                {UploadedImages &&
+                                    <ImageSlider CoverImage={CoverImage} setCoverImage={setCoverImage} removeProductImage={removeProductImage} images={UploadedImages} />
+                                }
+                                {ImageLoading && <Loader absolute />}
                             </CForm>
                         </CCardBody>
                         <CCardFooter>
-                            <CButton disabled={ProductName < 4 || CatagoryID === "0" || BuyPrice === "" || ProductPrice === "" || !UploadedImage} type="submit" size="sm" color="primary" onClick={() => submitHandler()}><CIcon name="cil-scrubber" /> Submit</CButton>
+                            <CButton className="mr-2" disabled={ProductName < 4 || CatagoryID === "0" || BuyPrice === "" || ProductPrice === "" || !UploadedImages} type="submit" size="sm" color="primary" onClick={() => submitHandler()}><CIcon name="cil-scrubber" /> Submit</CButton>
                             <CButton
                                 type="reset"
                                 size="sm" color="danger" onClick={() => resetFunc()}><CIcon name="cil-ban" /> Reset</CButton>

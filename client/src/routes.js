@@ -48,6 +48,7 @@ const CatagoryProducts = React.lazy(() => import('./views/Catagories/CatProducts
 const AllSales = React.lazy(() => import('./views/sales/AllSales'));
 const SaleDetails = React.lazy(() => import('./views/sales/SaleDetails'));
 const AddSale = React.lazy(() => import('./views/sales/AddSale'));
+const SaleProducts = React.lazy(() => import('./views/sales/SaleProducts'));
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
@@ -100,6 +101,7 @@ const routes = [
   { path: '/sales/allsales', exact: true, name: 'All Sales', component: AllSales },
   { path: '/sales/addsale', exact: true, name: 'Add Sale', component: AddSale },
   { path: '/sales/:id', exact: true, name: 'Sales Details', component: SaleDetails },
+  { path: '/sales/:id/products', exact: true, name: 'Sales Products', component: SaleProducts },
 ];
 
 export default routes;

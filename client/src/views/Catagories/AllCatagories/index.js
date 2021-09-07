@@ -14,6 +14,7 @@ import {
 import catagoryData from './CatagoryData'
 import { useDispatch, useSelector } from 'react-redux'
 import { getAllCatagories } from 'src/actions/CatagoryActions'
+import moment from 'moment'
 
 const getBadge = status => {
   switch (status) {
@@ -77,12 +78,18 @@ const AllCatagories = () => {
               clickableRows
               onRowClick={(item) => history.push(`/catagories/${item.categories_id}`)}
               scopedSlots={{
+                'register_date':
+                  (date) => (
+                    <td>
+                      {moment(date).format("LL")}
+                    </td>
+                  ),
                 'isActive':
                   (item) => (
                     <td>
                       <CBadge color={getBadge(item.categories_isActive)}>
-                      {item.categories_isActive}
-                    </CBadge>
+                        {item.categories_isActive}
+                      </CBadge>
                     </td>
                   )
               }}
