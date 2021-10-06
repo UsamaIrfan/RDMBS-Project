@@ -67,7 +67,7 @@ const Products = () => {
   const [ProductsOrderBy, setProductsOrderBy] = useState("product_id")
   const [ShowSearch, setShowSearch] = useState(false)
   const [Keywords, setKeywords] = React.useState("")
-  const [Desc, setDesc] = useState("true")
+  const [Desc, setDesc] = useState("DESC")
 
   // Selectors =================>
   const products = useSelector(state => state.products)
@@ -137,13 +137,14 @@ const Products = () => {
 
   const searchHandler = async () => {
     setIsLoading(true)
-    await dispatch(searchProducts(RangeValue[0], RangeValue[1], SelectedCatagory?.value, ProductsOrderBy, Keywords, Desc === "true" ? true : false))
+    await dispatch(searchProducts(RangeValue[0], RangeValue[1], Desc, SelectedCatagory?.value, ProductsOrderBy, Keywords))
     setIsLoading(false)
   }
 
   const removeFilters = () => {
-    dispatch(searchProducts(RangeValue[0], RangeValue[1]))
+    dispatch(searchProducts(RangeValue[0], RangeValue[1], "DESC"))
     setSelectedCatagory(null)
+    setDesc("DESC")
     setProductsOrderBy("product_id")
   }
 
@@ -235,11 +236,11 @@ const Products = () => {
               <CCol xl={2} className="p-3">
                 <CDropdown className="m-1">
                   <CDropdownToggle color="info">
-                    {Desc === "true" ? "Desc" : "Asc"}
+                    {Desc === "DESC" ? "Desc" : "Asc"}
                   </CDropdownToggle>
                   <CDropdownMenu value={Desc} onClick={(e) => setDesc(e.target.getAttribute("value"))} style={{ maxHeight: "250px", overflowY: "scroll" }}>
-                    <CDropdownItem value={true}>Desc</CDropdownItem>
-                    <CDropdownItem value={false}>Ascending</CDropdownItem>
+                    <CDropdownItem value={"DESC"}>Desc</CDropdownItem>
+                    <CDropdownItem value={"ASC"}>Ascending</CDropdownItem>
                     <CDropdownDivider />
                   </CDropdownMenu>
                 </CDropdown>

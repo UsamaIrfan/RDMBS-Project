@@ -333,7 +333,7 @@ export const addProductBarcode = (req, res) => {
 
 export const getProducts = (lowLimit, highLimit, res) => {
     const sqlGetProducts =
-        `SELECT * FROM products ${lowLimit && highLimit ? `LIMIT ${lowLimit}, ${highLimit}` : ""};`
+        `SELECT * FROM products ${lowLimit && highLimit ? `LIMIT ${lowLimit}, ${highLimit}` : ""} ORDER BY register_date DESC;`
 
 
     db.query(sqlGetProducts, (err, products) => {
@@ -655,7 +655,7 @@ export const searchProducts = (
     max,
     cat,
     orderBy,
-    desc,
+    desc=true,
     limit,
     res
 ) => {
@@ -667,7 +667,7 @@ export const searchProducts = (
         WHERE YEAR(register_date)${min && max ? ` between ${min} and ${max}` : ""}
         ${cat ? `AND parent_id = ${cat}` : ""}
         ${search && search?.length > 0 && search !== "" ? `AND product_name LIKE '%${search}%'` : ""}
-        ORDER BY ${orderBy ? orderBy : "product_id"} ${desc ? "DESC" : "ASC"}
+        ORDER BY ${orderBy ? orderBy : "product_id"} ${desc && desc}
         ${limit ? ` LIMIT ${limit}` : ""}
         ;`
 

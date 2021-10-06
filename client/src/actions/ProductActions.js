@@ -286,7 +286,7 @@ export const delProduct = (id, successAlert, FailAlert) => {
     }
 }
 
-export const searchProducts = (minYear, maxYear, catId, orderBy, searchKeywords, desc) => {
+export const searchProducts = (minYear, maxYear, desc, catId, orderBy, searchKeywords) => {
     return (dispatch) => {
         axios.get(`${SERVER_API}/api/searchProducts?minYear=${minYear}&maxYear=${maxYear}&desc=${desc}${catId ? `&catagory=${catId}` : ""}${orderBy ? `&orderBy=${orderBy}` : ""}${searchKeywords ? `&search=${searchKeywords}` : ""}`,
             {
