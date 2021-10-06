@@ -82,7 +82,7 @@ const Products = () => {
   // Page Change Handler ===============>
   const pageChange = newPage => {
     currentPage !== newPage && history.push(`/sales/allsales?page=${newPage}`)
-    getProducts((newPage - 1) * NUMBER_OF_SALES_PER_SCREEN)
+    // getProducts((newPage - 1) * NUMBER_OF_SALES_PER_SCREEN)
   }
 
   // Initial Number of pages and pages changing functions =====================>

@@ -10,37 +10,26 @@ import {
     CForm,
     CFormGroup,
     CFormText,
-    CTextarea,
     CInput,
     CModal,
     CModalBody,
     CModalFooter,
     CModalHeader,
     CModalTitle,
-    CListGroup,
-    CListGroupItem,
-    CInputFile,
-    CInputCheckbox,
     CLabel,
-    CSelect,
     CRow,
-    CSwitch
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { addProduct, addSale, getProductByBarcode, searchProducts } from '../../../actions/ProductActions'
+import { addSale } from '../../../actions/ProductActions'
 import { useSelector } from 'react-redux';
 import moment from "moment";
 import SweetAlert from 'react-bootstrap-sweetalert';
 import { getAllCatagories } from 'src/actions/CatagoryActions'
-import { GET_PRODUCTS, SERVER_API } from 'src/actions/actionTypes'
+import { SERVER_API } from 'src/actions/actionTypes'
 import axios from "axios"
-import { motion } from "framer-motion";
-import { LinearProgress } from '@material-ui/core'
 import AwesomeDebouncePromise from "awesome-debounce-promise";
-import BarcodeReader from 'react-barcode-reader'
 import AsyncSelect from 'react-select/async';
 import Scanner from 'src/reusable/BarCodeScanner'
-import Result from 'src/reusable/Result'
 import ReactToPrint from 'react-to-print'
 
 function AddProduct() {
@@ -368,9 +357,9 @@ function AddProduct() {
                                         <p className="form-control-static">{userEmail && userEmail}</p>
                                     </CCol>
                                 </CFormGroup>
-                                <CFormGroup row>
+                                {/* <CFormGroup row>
                                     <CCol md="3">
-                                        <CLabel htmlFor="text-input">Product Id</CLabel>
+                                        <CLabel htmlFor="text-input">Product Barcode</CLabel>
                                     </CCol>
                                     <CCol xs="12" md="9">
                                         <CCol className="d-flex flex-wrap justify-content-between m-0 p-0">
@@ -381,7 +370,7 @@ function AddProduct() {
                                         </CCol>
                                         <CFormText>Product Barcode</CFormText>
                                     </CCol>
-                                </CFormGroup>
+                                </CFormGroup> */}
                                 <CFormGroup row>
                                     <CCol md="3">
                                         <CLabel htmlFor="text-input">Product Name</CLabel>
@@ -413,6 +402,14 @@ function AddProduct() {
                                     </CCol>
                                     <CCol xs="12" md="9">
                                         <CInput value={AmountGiven > Total ? Math.abs(Total - AmountGiven) : 0} disabled id="text-input" type="number" name="text-input" placeholder="Amount in numbers" />
+                                    </CCol>
+                                </CFormGroup>
+                                <CFormGroup row>
+                                    <CCol md="3">
+                                        <CLabel htmlFor="text-input">Discount</CLabel>
+                                    </CCol>
+                                    <CCol xs="12" md="9">
+                                        <CInput value={0} disabled id="text-input" type="number" name="text-input" placeholder="Amount in numbers" />
                                     </CCol>
                                 </CFormGroup>
                             </CForm>

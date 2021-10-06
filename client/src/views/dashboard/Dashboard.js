@@ -53,8 +53,8 @@ const Dashboard = () => {
 
   return (
     <>
-      <CCol className="text-right mb-4">
-        <h2>Welcome back, <span>{user?.email}</span></h2>
+      <CCol className="welcome-text mb-4">
+        <p>Welcome back, <strong>{user?.email}</strong></p>
       </CCol>
       <CRow>
         <CCol xs="12" md="6" xl="6">

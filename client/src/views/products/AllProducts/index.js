@@ -67,6 +67,7 @@ const Products = () => {
   const [ProductsOrderBy, setProductsOrderBy] = useState("product_id")
   const [ShowSearch, setShowSearch] = useState(false)
   const [Keywords, setKeywords] = React.useState("")
+  const [Desc, setDesc] = useState("true")
 
   // Selectors =================>
   const products = useSelector(state => state.products)
@@ -75,7 +76,7 @@ const Products = () => {
   // Page Change Handler ===============>
   const pageChange = newPage => {
     currentPage !== newPage && history.push(`/products/allproducts?page=${newPage}`)
-    getProducts((newPage - 1) * NUMBER_OF_PRODUCT_PER_SCREEN)
+    // getProducts((newPage - 1) * NUMBER_OF_PRODUCT_PER_SCREEN)
   }
 
   // Initial Number of pages and pages changing functions =====================>
@@ -136,7 +137,7 @@ const Products = () => {
 
   const searchHandler = async () => {
     setIsLoading(true)
-    await dispatch(searchProducts(RangeValue[0], RangeValue[1], SelectedCatagory?.value, ProductsOrderBy, Keywords))
+    await dispatch(searchProducts(RangeValue[0], RangeValue[1], SelectedCatagory?.value, ProductsOrderBy, Keywords, Desc === "true" ? true : false))
     setIsLoading(false)
   }
 
@@ -204,7 +205,7 @@ const Products = () => {
                   onChange={handleChange}
                 />
               </CCol>}
-              <CCol xl={3} className="p-3">
+              <CCol xl={2} className="p-3">
                 <CDropdown className="m-1">
                   <CDropdownToggle color="info">
                     {SelectedCatagory ? SelectedCatagory.text : "Flter By Catagory"}
@@ -217,7 +218,7 @@ const Products = () => {
                   </CDropdownMenu>
                 </CDropdown>
               </CCol>
-              <CCol xl={3} className="p-3">
+              <CCol xl={2} className="p-3">
                 <CDropdown className="m-1">
                   <CDropdownToggle color="info">
                     Order By
@@ -227,6 +228,18 @@ const Products = () => {
                     <CDropdownItem value="product_id">Product ID</CDropdownItem>
                     <CDropdownItem value="register_date">Register Date</CDropdownItem>
                     <CDropdownItem value="product_expiry">Expiry Date</CDropdownItem>
+                    <CDropdownDivider />
+                  </CDropdownMenu>
+                </CDropdown>
+              </CCol>
+              <CCol xl={2} className="p-3">
+                <CDropdown className="m-1">
+                  <CDropdownToggle color="info">
+                    {Desc === "true" ? "Desc" : "Asc"}
+                  </CDropdownToggle>
+                  <CDropdownMenu value={Desc} onClick={(e) => setDesc(e.target.getAttribute("value"))} style={{ maxHeight: "250px", overflowY: "scroll" }}>
+                    <CDropdownItem value={true}>Desc</CDropdownItem>
+                    <CDropdownItem value={false}>Ascending</CDropdownItem>
                     <CDropdownDivider />
                   </CDropdownMenu>
                 </CDropdown>

@@ -62,3 +62,15 @@
     cursor: pointer;
     z-index: 20;
 }
+
+.welcome-text {
+    font-size: 1.5rem !important;
+    text-align: right;
+}
+
+@media screen and (max-width: 980px) {
+    .welcome-text {
+        font-size: 15px;
+        text-align: center;
+    }
+}

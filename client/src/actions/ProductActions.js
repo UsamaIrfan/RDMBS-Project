@@ -286,9 +286,9 @@ export const delProduct = (id, successAlert, FailAlert) => {
     }
 }
 
-export const searchProducts = (minYear, maxYear, catId, orderBy, searchKeywords) => {
+export const searchProducts = (minYear, maxYear, catId, orderBy, searchKeywords, desc) => {
     return (dispatch) => {
-        axios.get(`${SERVER_API}/api/searchProducts?minYear=${minYear}&maxYear=${maxYear}${catId ? `&catagory=${catId}` : ""}${orderBy ? `&orderBy=${orderBy}` : ""}${searchKeywords ? `&search=${searchKeywords}` : ""}`,
+        axios.get(`${SERVER_API}/api/searchProducts?minYear=${minYear}&maxYear=${maxYear}&desc=${desc}${catId ? `&catagory=${catId}` : ""}${orderBy ? `&orderBy=${orderBy}` : ""}${searchKeywords ? `&search=${searchKeywords}` : ""}`,
             {
                 headers: { "Content-Type": "application/json" },
             }
